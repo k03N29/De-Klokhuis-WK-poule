@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+@theme {
+  --color-klok-green: #006b3f;
+  --color-klok-green-dark: #004d2e;
+  --color-klok-green-darker: #003322;
+  --color-klok-green-light: #008a50;
+  --color-klok-gold: #D4AF37;
+  --color-klok-gold-light: #F5D76E;
+  --color-klok-gold-dark: #A88A1A;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #003322;
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Spin wheel animation */
+@keyframes spin-scroll {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
+.spin-fast {
+  animation: spin-scroll 0.15s linear infinite;
+}
+
+.spin-slow {
+  animation: spin-scroll 0.8s linear infinite;
+}
+
+/* Wout shake animation */
+@keyframes wout-shake {
+  0%, 100% { transform: rotate(-3deg) scale(1.05); }
+  25%       { transform: rotate(3deg)  scale(1.08); }
+  50%       { transform: rotate(-2deg) scale(1.05); }
+  75%       { transform: rotate(2deg)  scale(1.08); }
+}
+
+.wout-shake {
+  animation: wout-shake 0.3s ease-in-out infinite;
+}
+
+/* Pulse animation for beer button */
+@keyframes beer-pulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.04); }
+}
+
+.beer-pulse {
+  animation: beer-pulse 1.5s ease-in-out infinite;
+}
+
+/* Gold shimmer for rankings */
+@keyframes gold-shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.gold-shimmer {
+  background: linear-gradient(
+    90deg,
+    #D4AF37 0%,
+    #F5D76E 40%,
+    #D4AF37 60%,
+    #A88A1A 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gold-shimmer 3s linear infinite;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #003322;
+}
+::-webkit-scrollbar-thumb {
+  background: #006b3f;
+  border-radius: 2px;
+}
