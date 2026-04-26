@@ -65,6 +65,7 @@ export interface GlobalState {
   adt_uitdeel_active: boolean
   adt_uitdeel_by_user_id: string | null
   nl_tegenpunt_alert: boolean
+  wk_winner: string | null
 }
 
 export interface PointEvent {
@@ -111,4 +112,13 @@ export interface NlGoal {
   scorer_name: string
   scorer_position: 'aanvaller' | 'middenvelder' | 'verdediger'
   created_at: string
+}
+
+export interface WkWinnerPrediction {
+  id: number
+  user_id: string
+  predicted_country: string
+  points_awarded: number
+  created_at: string
+  updated_at: string
 }

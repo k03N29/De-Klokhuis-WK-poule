@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase'
 import BottleGrid from '@/components/BottleGrid'
 import AlertOverlay from '@/components/AlertOverlay'
 import KlokFlesje from '@/components/KlokFlesje'
-import type { User, Country, GlobalState, ScheduledPrediction, QuizQuestion, QuizAnswer } from '@/lib/types'
+import type { User, Country, GlobalState, ScheduledPrediction, QuizQuestion, QuizAnswer, PointEvent } from '@/lib/types'
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -22,6 +22,7 @@ export default function DashboardPage() {
   const [myPendingAdts, setMyPendingAdts] = useState<ScheduledPrediction[]>([])
   const [todayQuiz, setTodayQuiz] = useState<QuizQuestion | null>(null)
   const [myQuizAnswer, setMyQuizAnswer] = useState<QuizAnswer | null>(null)
+  const [myCountryPoints, setMyCountryPoints] = useState<PointEvent[]>([])
   const prevGsRef = useRef<GlobalState | null>(null)
 
   useEffect(() => {
@@ -69,6 +70,14 @@ export default function DashboardPage() {
       setGlobalState(gs)
     }
     if (predsRes.data) setMyPendingAdts(predsRes.data)
+
+    // Landen punten (wedstrijdresultaten)
+    const { data: pointsData } = await supabase
+      .from('point_events')
+      .select('*')
+      .eq('user_id', currentUser.id)
+      .like('reason', '⚽%')
+    if (pointsData) setMyCountryPoints(pointsData)
 
     // Today's quiz question
     const today = new Date().toISOString().split('T')[0]
@@ -300,6 +309,21 @@ export default function DashboardPage() {
           </a>
         )}
 
+        {/* Draft knop (alleen als draft nog niet klaar is) */}
+        {!globalState?.draft_completed && (
+          <a href="/draft"
+            className="block text-center py-4 rounded-2xl font-black text-lg transition-all active:scale-95"
+            style={{
+              background: 'linear-gradient(135deg, #004d2e, #006b3f)',
+              border: '2px solid #D4AF37',
+              color: '#D4AF37',
+              fontFamily: 'Arial Black, Arial',
+              boxShadow: '0 4px 0 #A88A1A',
+            }}>
+            🎡 LANDEN DRAFT — Doe mee!
+          </a>
+        )}
+
         {/* Snelkoppelingen */}
         <div className="grid grid-cols-2 gap-2">
           <a href="/voorspellingen" className="py-3 rounded-xl text-center text-sm font-bold"
@@ -314,7 +338,11 @@ export default function DashboardPage() {
             style={{ backgroundColor: '#1a0a2e', color: '#a78bfa', border: '1px solid #7c3aed' }}>
             🧠 Quiz
           </a>
-          <a href="/spelregels" className="py-3 rounded-xl text-center text-sm font-bold"
+          <a href="/wk-winnaar" className="py-3 rounded-xl text-center text-sm font-bold"
+            style={{ backgroundColor: '#003d22', color: '#D4AF37', border: '1px solid #D4AF37' }}>
+            🏆 WK Winnaar
+          </a>
+          <a href="/spelregels" className="py-3 rounded-xl text-center text-sm font-bold col-span-2"
             style={{ backgroundColor: '#003322', color: '#D4AF37', border: '1px solid #004d2e' }}>
             📋 Spelregels
           </a>
@@ -396,14 +424,40 @@ export default function DashboardPage() {
               style={{ fontFamily: 'Arial Black, Arial' }}>
               <Flag className="w-5 h-5" /> JOUW LANDEN
             </h2>
-            <div className="grid grid-cols-2 gap-3">
-              {myCountries.map(country => (
-                <div key={country.id} className="rounded-2xl p-4 text-center"
-                  style={{ backgroundColor: '#006b3f' }}>
-                  <div className="text-4xl mb-1">{country.flag_emoji}</div>
-                  <div className="text-white font-bold text-sm">{country.name}</div>
-                </div>
-              ))}
+            <div className="grid grid-cols-1 gap-3">
+              {myCountries.map(country => {
+                const countryEvents = myCountryPoints.filter(e =>
+                  e.reason.includes(country.name)
+                )
+                const totalPts = countryEvents.reduce((sum, e) => sum + e.points, 0)
+                return (
+                  <div key={country.id} className="rounded-2xl p-4"
+                    style={{ backgroundColor: '#006b3f', border: '1px solid #00804a' }}>
+                    <div className="flex items-center gap-3">
+                      <div className="text-4xl">{country.flag_emoji}</div>
+                      <div className="flex-1">
+                        <div className="text-white font-bold text-base">{country.name}</div>
+                        {countryEvents.length > 0 ? (
+                          <div className="mt-1 space-y-0.5">
+                            {countryEvents.map(e => (
+                              <div key={e.id} className="flex justify-between items-center text-xs">
+                                <span className="text-green-300">{e.reason.replace('⚽ ', '')}</span>
+                                <span className="text-yellow-400 font-black ml-2">+{e.points}p</span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-green-600 text-xs mt-1">Nog geen wedstrijden gespeeld</div>
+                        )}
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <div className="text-yellow-400 font-black text-xl">{totalPts}</div>
+                        <div className="text-green-500 text-xs">punten</div>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           </div>
         )}

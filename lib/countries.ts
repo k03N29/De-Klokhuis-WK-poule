@@ -67,8 +67,19 @@ export const PLAYERS = [
   'Kadia',
 ]
 
-export const LANDS_PER_SPELER = 4
-export const TOTAL_PICKS = PLAYERS.length * LANDS_PER_SPELER // 28
+export const LANDS_PER_SPELER = 3
+export const TOTAL_PICKS = PLAYERS.length * LANDS_PER_SPELER // 21
+
+// Ronde 1: elke speler krijgt een van deze top 7 kanshebbers (bookmakers WK 2026)
+export const TOP_KANSHEBBERS = [
+  'Brazilië',
+  'Frankrijk',
+  'Engeland',
+  'Spanje',
+  'Argentinië',
+  'Duitsland',
+  'Portugal',
+]
 
 export const CLUB_BONUS_CLUBS = ['Feyenoord', 'PSV', 'FC Groningen']
 

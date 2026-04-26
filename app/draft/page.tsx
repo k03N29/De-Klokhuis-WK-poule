@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { PLAYERS, TOTAL_PICKS, LANDS_PER_SPELER } from '@/lib/countries'
+import { PLAYERS, TOTAL_PICKS, LANDS_PER_SPELER, TOP_KANSHEBBERS } from '@/lib/countries'
 import type { User, Country, GlobalState } from '@/lib/types'
 
 function sleep(ms: number) {
@@ -59,7 +59,11 @@ export default function DraftPage() {
   const isMyTurn = currentUser?.name === currentPlayerName
   const isAdmin = currentUser?.name === users[0]?.name // eerste gebruiker als admin fallback
 
-  const available = countries.filter(c => c.owner_id === null)
+  // Ronde 1: alleen top 7 kanshebbers, daarna alle resterende landen
+  const isRound1 = currentRound === 1
+  const available = isRound1
+    ? countries.filter(c => c.owner_id === null && TOP_KANSHEBBERS.includes(c.name))
+    : countries.filter(c => c.owner_id === null)
 
   const spin = async () => {
     if (spinRef.current || available.length === 0 || draftDone) return
@@ -139,11 +143,19 @@ export default function DraftPage() {
           🎡 KLOK-RAD DRAFT
         </h1>
         <p className="text-green-300 text-xs">
-          Pick {assignedCount}/{TOTAL_PICKS} • Ronde {Math.min(currentRound, LANDS_PER_SPELER)}/4
+          Pick {assignedCount}/{TOTAL_PICKS} • Ronde {Math.min(currentRound, LANDS_PER_SPELER)}/{LANDS_PER_SPELER}
         </p>
       </div>
 
       <div className="px-4 pt-6 space-y-6">
+
+        {/* Ronde 1 banner */}
+        {!draftDone && isRound1 && (
+          <div className="rounded-xl px-4 py-2 text-center text-sm font-bold"
+            style={{ backgroundColor: '#D4AF37', color: '#003322' }}>
+            🏆 Ronde 1 — iedereen pakt een TOP KANSHEBBER
+          </div>
+        )}
 
         {/* Huidig aan de beurt */}
         {!draftDone && (

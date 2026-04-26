@@ -44,17 +44,7 @@ export default function LoginPage() {
 
       localStorage.setItem('klok_user', JSON.stringify(data as User))
 
-      // Check of draft al gedaan is
-      const { data: gs } = await supabase
-        .from('global_state')
-        .select('draft_completed')
-        .single()
-
-      if (gs?.draft_completed) {
-        router.push('/dashboard')
-      } else {
-        router.push('/draft')
-      }
+      router.push('/dashboard')
     } catch {
       setError('Kan geen verbinding maken. Check je .env.local bestand!')
       setLoading(false)

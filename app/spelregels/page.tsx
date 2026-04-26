@@ -56,7 +56,7 @@ export default function SpelregelsPage() {
         <Section emoji="🏆" title="HOE WIN JE?" color="#D4AF37">
           <BigRule>
             Degene met de <strong>meeste punten</strong> op het einde van het WK wordt de{' '}
-            <span style={{ color: '#D4AF37' }}>🍺 BIERKONING(IN)</span> van het Klokhuis.
+            <span style={{ color: '#D4AF37' }}>🍺 BIERKONING(IN)</span> van De Klokhuis.
           </BigRule>
           <p className="text-green-300 text-sm text-center italic mt-2">
             "Winnen is Drinken, Drinken is Winnen"
