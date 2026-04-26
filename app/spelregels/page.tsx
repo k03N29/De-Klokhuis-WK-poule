@@ -68,19 +68,19 @@ export default function SpelregelsPage() {
           <ScoreRow emoji="🍺" label="Klokje drinken" points="+1p" desc="Gewoon een De Klok pakken en drinken. Druk op de groene knop." />
           <ScoreRow emoji="💥" label="ADT drinken" points="+2p" desc="Ad Fundum — in één teug leegdrinken. Druk op de rode knop." />
           <p className="text-green-600 text-xs text-center mt-2 italic">
-            * telt alleen tijdens het WK
+            * telt alleen tijdens het WK (11 juni – 19 juli 2026)
           </p>
         </Section>
 
         {/* Landen */}
         <Section emoji="🌍" title="JOUW LANDEN" color="#004d2e">
           <p className="text-green-300 text-sm mb-3">
-            Elke speler krijgt via de draft <strong className="text-white">4 WK-landen</strong> toegewezen.
+            Elke speler krijgt via de draft <strong className="text-white">3 WK-landen</strong> toegewezen.
             Als jouw land iets doet, verdien jij punten — automatisch, zonder iets te doen.
           </p>
           <ScoreRow emoji="🏆" label="Jouw land wint een wedstrijd" points="+3p" />
           <ScoreRow emoji="🤝" label="Jouw land speelt gelijk" points="+1p" />
-          <ScoreRow emoji="⭐" label="Feyenoord/PSV/Groningen-speler scoort voor jouw land" points="+1p" desc="Club-bonus, toegekend door admin." />
+          <ScoreRow emoji="⭐" label="Feyenoord/PSV/Groningen-speler scoort voor jouw land" points="+1p" desc="Club-bonus, toegekend door Grote Koen." />
         </Section>
 
         {/* Voorspellingen */}
@@ -140,7 +140,7 @@ export default function SpelregelsPage() {
             Als Nederland een tegendoelpunt krijgt: <strong style={{ color: '#FF4444' }}>IEDEREEN ADT.</strong>
           </BigRule>
           <p className="text-red-400 text-xs text-center mt-1 italic">
-            De admin kan dit triggeren → overlay verschijnt op ieders scherm.
+            Grote Koen kan dit triggeren → overlay verschijnt op ieders scherm.
           </p>
         </Section>
 
@@ -153,12 +153,12 @@ export default function SpelregelsPage() {
           </p>
         </Section>
 
-        <Section emoji="⏱️" title="ADT-WEDSTRIJD" color="#003322">
-          <p className="text-green-300 text-sm mb-2">
-            Een speciale spontane wedstrijd. De admin start een timer — wie als eerste op de knop drukt, wint en iedereen anders moet ADT'en.
-          </p>
-          <p className="text-green-600 text-xs italic">
-            Kan op elk moment ingezet worden door de admin.
+        <Section emoji="⏱️" title="GELIJKE STAND = ADT-WEDSTRIJD" color="#003322">
+          <BigRule>
+            Eindigt een wedstrijd gelijk? Dan <strong style={{ color: '#D4AF37' }}>ADT voor iedereen.</strong>
+          </BigRule>
+          <p className="text-green-600 text-xs text-center mt-2 italic">
+            Gaat toch niet gebeuren.
           </p>
         </Section>
 
