@@ -116,8 +116,8 @@ export default function SpelregelsPage() {
         {/* Quiz */}
         <Section emoji="🧠" title="DAGELIJKSE QUIZ" color="#1a0a2e" borderColor="#7c3aed">
           <p className="text-purple-300 text-sm mb-3">
-            Elke speeldag verschijnt er een vraag over de wedstrijd van die dag.
-            Verrassend weinig voetbalkennis vereist.
+            Elke speeldag verschijnt er een vraag over het land dat die dag speelt —
+            bier, klokken, tijdzones en ludieke weetjes. Geen voetbalkennis nodig.
           </p>
           <ScoreRow emoji="✅" label="Juiste antwoord" points="+1p" color="#a78bfa" />
           <ScoreRow emoji="❌" label="Fout antwoord" points="0p" />

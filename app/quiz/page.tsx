@@ -100,7 +100,7 @@ export default function QuizPage() {
           <div className="text-yellow-400 font-black text-base" style={{ fontFamily: 'Arial Black, Arial' }}>
             🧠 DAGELIJKSE QUIZ
           </div>
-          <div className="text-purple-400 text-xs">elke speeldag 1 vraag • goed = +1p</div>
+          <div className="text-purple-400 text-xs">over het land van die dag — in Klokhuis-stijl 🕰️🍺</div>
         </div>
         {totalQuizPts > 0 && (
           <div className="text-right">
@@ -111,6 +111,16 @@ export default function QuizPage() {
       </div>
 
       <div className="px-4 pt-5 space-y-4">
+
+        {/* Uitleg banner */}
+        <div className="rounded-xl px-4 py-3 text-center"
+          style={{ backgroundColor: '#1a0a2e', border: '1px solid #4c1d95' }}>
+          <p className="text-purple-300 text-xs leading-relaxed">
+            Elke speeldag een vraag over het land dat die dag speelt —{' '}
+            <span className="text-yellow-400 font-bold">bier, klokken, tijdzones en ludieke weetjes.</span>{' '}
+            Geen voetbalkennis nodig. Goed = <span className="text-yellow-400 font-bold">+1p</span>.
+          </p>
+        </div>
 
         {/* Today's question — big and prominent */}
         {today ? (
