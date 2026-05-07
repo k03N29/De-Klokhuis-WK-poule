@@ -100,6 +100,17 @@ export default function DashboardPage() {
     return () => clearInterval(interval)
   }, [fetchData])
 
+  const undoBeer = async () => {
+    if (!currentUser || beerLoading || currentUser.beers_drunk <= 0) return
+    setBeerLoading(true)
+    await supabase.from('users').update({
+      total_points: currentUser.total_points - 1,
+      beers_drunk: currentUser.beers_drunk - 1,
+    }).eq('id', currentUser.id)
+    await fetchData()
+    setBeerLoading(false)
+  }
+
   const drinkBeer = async () => {
     if (!currentUser || beerLoading) return
     setBeerLoading(true)
@@ -280,7 +291,17 @@ export default function DashboardPage() {
             <span className="text-xs font-normal text-red-300">+2 punten</span>
           </button>
         </div>
-        <p className="text-green-600 text-xs text-center -mt-3">
+        {/* Undo misklikt */}
+        {currentUser.beers_drunk > 0 && (
+          <div className="flex justify-center -mt-1">
+            <button onClick={undoBeer} disabled={beerLoading}
+              className="text-xs text-green-800 py-1 px-3 rounded-lg active:scale-95 transition-all"
+              style={{ backgroundColor: '#002211' }}>
+              ↩ misklikt? −1 klokje
+            </button>
+          </div>
+        )}
+        <p className="text-green-600 text-xs text-center -mt-1">
           🍺 {currentUser.beers_drunk} klokjes • 💥 {currentUser.adts_drunk || 0} adtjes — alleen tijdens het WK
         </p>
 
