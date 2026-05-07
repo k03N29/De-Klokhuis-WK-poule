@@ -22,6 +22,7 @@ export default function DashboardPage() {
   const [myPendingAdts, setMyPendingAdts] = useState<ScheduledPrediction[]>([])
   const [todayQuiz, setTodayQuiz] = useState<QuizQuestion | null>(null)
   const [myQuizAnswer, setMyQuizAnswer] = useState<QuizAnswer | null>(null)
+  const [allCountries, setAllCountries] = useState<Country[]>([])
   const [myCountryPoints, setMyCountryPoints] = useState<PointEvent[]>([])
   const prevGsRef = useRef<GlobalState | null>(null)
 
@@ -44,7 +45,10 @@ export default function DashboardPage() {
         .eq('adt_uitgedeeld', false),
     ])
     if (usersRes.data) setAllUsers(usersRes.data)
-    if (countriesRes.data) setMyCountries(countriesRes.data.filter((c: Country) => c.owner_id === currentUser.id))
+    if (countriesRes.data) {
+      setMyCountries(countriesRes.data.filter((c: Country) => c.owner_id === currentUser.id))
+      setAllCountries(countriesRes.data)
+    }
     if (gsRes.data) {
       const gs = gsRes.data as GlobalState
       if (!prevGsRef.current) {
@@ -473,6 +477,43 @@ export default function DashboardPage() {
                         <div className="text-yellow-400 font-black text-xl">{totalPts}</div>
                         <div className="text-green-500 text-xs">punten</div>
                       </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Alle picks — ieders landen */}
+        {globalState?.draft_completed && allCountries.some(c => c.owner_id) && (
+          <div>
+            <h2 className="text-yellow-400 font-black text-lg mb-3 flex items-center gap-2"
+              style={{ fontFamily: 'Arial Black, Arial' }}>
+              🌍 ALLE PICKS
+            </h2>
+            <div className="space-y-2">
+              {allUsers.map(user => {
+                const picks = allCountries.filter(c => c.owner_id === user.id)
+                if (picks.length === 0) return null
+                const isMe = user.id === currentUser.id
+                return (
+                  <div key={user.id} className="rounded-2xl px-4 py-3"
+                    style={{
+                      backgroundColor: isMe ? '#006b3f' : '#004d2e',
+                      border: isMe ? '1px solid #D4AF37' : '1px solid transparent',
+                    }}>
+                    <div className="text-sm font-bold mb-2"
+                      style={{ color: isMe ? '#D4AF37' : 'white' }}>
+                      {isMe ? '⭐ ' : ''}{user.name}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {picks.map(c => (
+                        <span key={c.id} className="rounded-lg px-2 py-1 text-sm flex items-center gap-1"
+                          style={{ backgroundColor: '#003322', color: 'white' }}>
+                          {c.flag_emoji} {c.name}
+                        </span>
+                      ))}
                     </div>
                   </div>
                 )
