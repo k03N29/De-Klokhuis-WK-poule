@@ -297,7 +297,7 @@ export default function DashboardPage() {
             <button onClick={undoBeer} disabled={beerLoading}
               className="text-xs text-green-800 py-1 px-3 rounded-lg active:scale-95 transition-all"
               style={{ backgroundColor: '#002211' }}>
-              ↩ misklikt? −1 klokje
+              🧒 kleine speler — −1 biertje
             </button>
           </div>
         )}
