@@ -292,15 +292,13 @@ export default function DashboardPage() {
           </button>
         </div>
         {/* Undo misklikt */}
-        {currentUser.beers_drunk > 0 && (
-          <div className="flex justify-center -mt-1">
-            <button onClick={undoBeer} disabled={beerLoading}
-              className="text-xs text-green-800 py-1 px-3 rounded-lg active:scale-95 transition-all"
-              style={{ backgroundColor: '#002211' }}>
-              🧒 kleine speler — −1 biertje
-            </button>
-          </div>
-        )}
+        <div className="flex justify-center -mt-1">
+          <button onClick={undoBeer} disabled={beerLoading || currentUser.beers_drunk <= 0}
+            className="text-xs py-1 px-3 rounded-lg active:scale-95 transition-all disabled:opacity-30"
+            style={{ backgroundColor: '#002211', color: '#4ade80' }}>
+            🧒 kleine speler — −1 biertje
+          </button>
+        </div>
         <p className="text-green-600 text-xs text-center -mt-1">
           🍺 {currentUser.beers_drunk} klokjes • 💥 {currentUser.adts_drunk || 0} adtjes — alleen tijdens het WK
         </p>
