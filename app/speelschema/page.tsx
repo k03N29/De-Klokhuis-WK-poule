@@ -6,7 +6,7 @@ import { ArrowLeft, Clock } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import type { ScheduledMatch, Country } from '@/lib/types'
 
-// Vlag emojis voor alle teams in de pool
+// Vlag emojis voor alle teams in de poule
 const FLAG: Record<string, string> = {
   'Mexico': '🇲🇽',
   'Zuid-Afrika': '🇿🇦',
@@ -126,7 +126,7 @@ export default function SpeelschemaPage() {
           <div className="text-yellow-400 font-black text-base" style={{ fontFamily: 'Arial Black, Arial' }}>
             📅 SPEELSCHEMA
           </div>
-          <div className="text-green-400 text-xs">21 poolvedstrijden · tijden in NL (CEST)</div>
+          <div className="text-green-400 text-xs">21 poulewedstrijden · tijden in NL (CEST)</div>
         </div>
         <Clock className="w-5 h-5 text-green-500" />
       </div>
@@ -245,7 +245,7 @@ export default function SpeelschemaPage() {
           <div className="rounded-2xl p-4 text-center space-y-1"
             style={{ backgroundColor: '#003322', border: '1px solid #006b3f' }}>
             <p className="text-green-400 text-sm">
-              <span className="font-bold">{matches.length}</span> poolwedstrijden totaal
+              <span className="font-bold">{matches.length}</span> poulewedstrijden totaal
             </p>
             <p className="text-blue-400 text-sm">
               <span className="font-bold">{nlMatchCount}</span> × Oranje 🇳🇱
