@@ -161,9 +161,15 @@ export default function DashboardPage() {
     try {
       const ext = file.name.split('.').pop()
       const path = `${currentUser.id}.${ext}`
-      await supabase.storage.from('avatars').upload(path, file, { upsert: true })
+      const { error: uploadError } = await supabase.storage.from('avatars').upload(path, file, { upsert: true })
+      if (uploadError) {
+        console.error('Avatar upload error:', uploadError)
+        alert(`Foto upload mislukt: ${uploadError.message}`)
+        return
+      }
       const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path)
-      await supabase.from('users').update({ avatar_url: urlData.publicUrl }).eq('id', currentUser.id)
+      const { error: updateError } = await supabase.from('users').update({ avatar_url: urlData.publicUrl }).eq('id', currentUser.id)
+      if (updateError) console.error('Avatar url update error:', updateError)
       await fetchData()
     } finally { setAvatarUploading(false) }
   }
@@ -365,8 +371,12 @@ export default function DashboardPage() {
             style={{ backgroundColor: '#003d22', color: '#D4AF37', border: '1px solid #D4AF37' }}>
             🏆 WK Winnaar
           </a>
+          <a href="/speelschema" className="py-3 rounded-xl text-center text-sm font-bold"
+            style={{ backgroundColor: '#003322', color: '#4ade80', border: '1px solid #006b3f' }}>
+            📅 Speelschema
+          </a>
           <a href="/spelregels" className="py-3 rounded-xl text-center text-sm font-bold col-span-2"
-            style={{ backgroundColor: '#003322', color: '#D4AF37', border: '1px solid #004d2e' }}>
+            style={{ backgroundColor: '#002211', color: '#6b7280', border: '1px solid #1f2937' }}>
             📋 Spelregels
           </a>
         </div>
