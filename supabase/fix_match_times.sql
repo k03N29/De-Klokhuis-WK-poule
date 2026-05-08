@@ -5,7 +5,7 @@
 -- ============================================================
 
 -- 1. Correcte tijden (UTC) voor alle 21 poolwedstrijden
---    Ongewijzigd: Mexico-ZA (20:00✓), FR-Senegal (20:00✓), Oezb-Colombia (03:00✓), Uruguay-Spanje (01:00✓)
+--    Ongewijzigd: Mexico-ZA (20:00), FR-Senegal (20:00), Oezb-Colombia (03:00), Uruguay-Spanje (01:00)
 
 UPDATE scheduled_matches SET match_date = '2026-06-12 19:00:00+00'
   WHERE team1 = 'Canada' AND team2 = 'Bosnië-Herzegovina';
@@ -21,7 +21,7 @@ UPDATE scheduled_matches SET match_date = '2026-06-14 17:00:00+00'
 
 UPDATE scheduled_matches SET match_date = '2026-06-14 20:00:00+00'
   WHERE team1 = 'Nederland' AND team2 = 'Japan';
--- Arlington TX (CDT=UTC-5), 15:00 CDT = 20:00 UTC = 22:00 CEST 🇳🇱
+-- Arlington TX (CDT=UTC-5), 15:00 CDT = 20:00 UTC = 22:00 CEST (NL)
 
 UPDATE scheduled_matches SET match_date = '2026-06-15 19:00:00+00'
   WHERE team1 = 'België' AND team2 = 'Egypte';
@@ -41,7 +41,7 @@ UPDATE scheduled_matches SET match_date = '2026-06-20 01:00:00+00'
 
 UPDATE scheduled_matches SET match_date = '2026-06-20 17:00:00+00'
   WHERE team1 = 'Nederland' AND team2 = 'Zweden';
--- Houston (CDT=UTC-5), 12:00 CDT = 17:00 UTC = 19:00 CEST 🇳🇱
+-- Houston (CDT=UTC-5), 12:00 CDT = 17:00 UTC = 19:00 CEST (NL)
 
 UPDATE scheduled_matches SET match_date = '2026-06-21 16:00:00+00'
   WHERE team1 = 'Spanje' AND team2 = 'Saoedi-Arabië';
@@ -65,7 +65,7 @@ UPDATE scheduled_matches SET match_date = '2026-06-25 20:00:00+00'
 
 UPDATE scheduled_matches SET match_date = '2026-06-25 23:00:00+00'
   WHERE team1 = 'Tunesië' AND team2 = 'Nederland';
--- Kansas City (CDT=UTC-5), 18:00 CDT = 23:00 UTC = 01:00 CEST (26 jun) 🇳🇱
+-- Kansas City (CDT=UTC-5), 18:00 CDT = 23:00 UTC = 01:00 CEST (26 jun, NL)
 
 UPDATE scheduled_matches SET match_date = '2026-06-26 19:00:00+00'
   WHERE team1 = 'Noorwegen' AND team2 = 'Frankrijk';
@@ -83,33 +83,15 @@ INSERT INTO storage.buckets (id, name, public)
 VALUES ('avatars', 'avatars', true)
 ON CONFLICT (id) DO UPDATE SET public = true;
 
--- Storage policy: iedereen mag uploaden (geen auth vereist)
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE policyname = 'avatars_public_upload' AND tablename = 'objects'
-  ) THEN
-    EXECUTE $pol$
-      CREATE POLICY "avatars_public_upload" ON storage.objects
-        FOR INSERT WITH CHECK (bucket_id = 'avatars');
-    $pol$;
-  END IF;
+-- Storage policies (upload/lezen/updaten zonder auth)
+DROP POLICY IF EXISTS "avatars_public_upload" ON storage.objects;
+CREATE POLICY "avatars_public_upload" ON storage.objects
+  FOR INSERT WITH CHECK (bucket_id = 'avatars');
 
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE policyname = 'avatars_public_read' AND tablename = 'objects'
-  ) THEN
-    EXECUTE $pol$
-      CREATE POLICY "avatars_public_read" ON storage.objects
-        FOR SELECT USING (bucket_id = 'avatars');
-    $pol$;
-  END IF;
+DROP POLICY IF EXISTS "avatars_public_read" ON storage.objects;
+CREATE POLICY "avatars_public_read" ON storage.objects
+  FOR SELECT USING (bucket_id = 'avatars');
 
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE policyname = 'avatars_public_update' AND tablename = 'objects'
-  ) THEN
-    EXECUTE $pol$
-      CREATE POLICY "avatars_public_update" ON storage.objects
-        FOR UPDATE USING (bucket_id = 'avatars');
-    $pol$;
-  END IF;
-END $$;
+DROP POLICY IF EXISTS "avatars_public_update" ON storage.objects;
+CREATE POLICY "avatars_public_update" ON storage.objects
+  FOR UPDATE USING (bucket_id = 'avatars');
