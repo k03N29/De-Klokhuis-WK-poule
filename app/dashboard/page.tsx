@@ -414,7 +414,7 @@ export default function DashboardPage() {
                       {isMe && (
                         <label className="absolute inset-0 flex items-end justify-center pb-1 cursor-pointer"
                           style={{ background: 'linear-gradient(transparent 50%, rgba(0,0,0,0.65))' }}>
-                          <input type="file" accept="image/*" capture="user" className="hidden"
+                          <input type="file" accept="image/*" className="hidden"
                             onChange={e => e.target.files?.[0] && uploadAvatar(e.target.files[0])} />
                           <span className="text-white text-xs flex items-center gap-0.5">
                             <Camera className="w-3 h-3" />{avatarUploading ? '...' : 'foto'}
