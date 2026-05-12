@@ -40,26 +40,47 @@ export default function BeheerPage() {
 
   const uploadFoto = async (user: User, file: File) => {
     setUploading(user.id)
-    setStatus(s => ({ ...s, [user.id]: '⏳ verkleinen & uploaden...' }))
+    setStatus(s => ({ ...s, [user.id]: '⏳ verkleinen...' }))
     try {
       const verkleind = await verkleenFoto(file)
       const path = `${user.id}.jpg`
+
+      // Verwijder eerst oud bestand (voorkomt upsert-conflict)
+      await supabase.storage.from('avatars').remove([path])
+
+      setStatus(s => ({ ...s, [user.id]: '⏳ uploaden naar storage...' }))
       const { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(path, verkleind, { upsert: true, contentType: 'image/jpeg' })
+        .upload(path, verkleind, { contentType: 'image/jpeg' })
 
       if (uploadError) {
-        setStatus(s => ({ ...s, [user.id]: `❌ ${uploadError.message}` }))
+        setStatus(s => ({ ...s, [user.id]: `❌ Storage fout: ${uploadError.message}` }))
         return
       }
 
       const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path)
-      // cache-buster zodat nieuwe foto meteen zichtbaar is
-      const urlMetTimestamp = `${urlData.publicUrl}?t=${Date.now()}`
-      await supabase.from('users').update({ avatar_url: urlMetTimestamp }).eq('id', user.id)
+      const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`
 
-      setUsers(u => u.map(u2 => u2.id === user.id ? { ...u2, avatar_url: urlMetTimestamp } : u2))
-      setStatus(s => ({ ...s, [user.id]: '✅ opgeslagen!' }))
+      setStatus(s => ({ ...s, [user.id]: '⏳ opslaan in database...' }))
+      const { error: dbError } = await supabase
+        .from('users')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user.id)
+
+      if (dbError) {
+        setStatus(s => ({ ...s, [user.id]: `❌ Database fout: ${dbError.message}` }))
+        return
+      }
+
+      // Verifieer dat het daadwerkelijk opgeslagen is
+      const { data: verify } = await supabase.from('users').select('avatar_url').eq('id', user.id).single()
+      if (!verify?.avatar_url) {
+        setStatus(s => ({ ...s, [user.id]: '❌ Opgeslagen maar URL is leeg — check RLS?' }))
+        return
+      }
+
+      setUsers(u => u.map(u2 => u2.id === user.id ? { ...u2, avatar_url: publicUrl } : u2))
+      setStatus(s => ({ ...s, [user.id]: '✅ Opgeslagen en geverifieerd!' }))
     } finally {
       setUploading(null)
     }
