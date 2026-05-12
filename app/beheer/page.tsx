@@ -59,7 +59,7 @@ export default function BeheerPage() {
       }
 
       const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path)
-      const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`
+      const publicUrl = urlData.publicUrl  // schone URL, geen timestamp
 
       setStatus(s => ({ ...s, [user.id]: '⏳ opslaan in database...' }))
       const { error: dbError } = await supabase
