@@ -6,6 +6,26 @@ import { ArrowLeft } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import type { User } from '@/lib/types'
 
+// Verkleint grote foto's automatisch naar max 600px en converteert naar JPEG
+async function verkleenFoto(file: File): Promise<Blob> {
+  return new Promise((resolve) => {
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      const maxPx = 600
+      let { width, height } = img
+      if (width > height && width > maxPx) { height = Math.round(height * maxPx / width); width = maxPx }
+      else if (height > maxPx) { width = Math.round(width * maxPx / height); height = maxPx }
+      const canvas = document.createElement('canvas')
+      canvas.width = width; canvas.height = height
+      canvas.getContext('2d')!.drawImage(img, 0, 0, width, height)
+      URL.revokeObjectURL(url)
+      canvas.toBlob(blob => resolve(blob!), 'image/jpeg', 0.85)
+    }
+    img.src = url
+  })
+}
+
 export default function BeheerPage() {
   const router = useRouter()
   const [users, setUsers] = useState<User[]>([])
@@ -20,13 +40,13 @@ export default function BeheerPage() {
 
   const uploadFoto = async (user: User, file: File) => {
     setUploading(user.id)
-    setStatus(s => ({ ...s, [user.id]: '⏳ uploaden...' }))
+    setStatus(s => ({ ...s, [user.id]: '⏳ verkleinen & uploaden...' }))
     try {
-      const ext = file.name.split('.').pop()
-      const path = `${user.id}.${ext}`
+      const verkleind = await verkleenFoto(file)
+      const path = `${user.id}.jpg`
       const { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(path, file, { upsert: true })
+        .upload(path, verkleind, { upsert: true, contentType: 'image/jpeg' })
 
       if (uploadError) {
         setStatus(s => ({ ...s, [user.id]: `❌ ${uploadError.message}` }))
@@ -34,9 +54,11 @@ export default function BeheerPage() {
       }
 
       const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path)
-      await supabase.from('users').update({ avatar_url: urlData.publicUrl }).eq('id', user.id)
+      // cache-buster zodat nieuwe foto meteen zichtbaar is
+      const urlMetTimestamp = `${urlData.publicUrl}?t=${Date.now()}`
+      await supabase.from('users').update({ avatar_url: urlMetTimestamp }).eq('id', user.id)
 
-      setUsers(u => u.map(u2 => u2.id === user.id ? { ...u2, avatar_url: urlData.publicUrl } : u2))
+      setUsers(u => u.map(u2 => u2.id === user.id ? { ...u2, avatar_url: urlMetTimestamp } : u2))
       setStatus(s => ({ ...s, [user.id]: '✅ opgeslagen!' }))
     } finally {
       setUploading(null)
