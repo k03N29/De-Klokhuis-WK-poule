@@ -104,12 +104,11 @@ export default function DashboardPage() {
     return () => clearInterval(interval)
   }, [fetchData])
 
-  const undoBeer = async () => {
-    if (!currentUser || beerLoading || currentUser.beers_drunk <= 0) return
+  const undoPoint = async () => {
+    if (!currentUser || beerLoading || currentUser.total_points <= 0) return
     setBeerLoading(true)
     await supabase.from('users').update({
       total_points: currentUser.total_points - 1,
-      beers_drunk: currentUser.beers_drunk - 1,
     }).eq('id', currentUser.id)
     await fetchData()
     setBeerLoading(false)
@@ -303,10 +302,10 @@ export default function DashboardPage() {
         </div>
         {/* Undo misklikt */}
         <div className="flex justify-center -mt-1">
-          <button onClick={undoBeer} disabled={beerLoading || currentUser.beers_drunk <= 0}
+          <button onClick={undoPoint} disabled={beerLoading || currentUser.total_points <= 0}
             className="text-xs py-1 px-3 rounded-lg active:scale-95 transition-all disabled:opacity-30"
             style={{ backgroundColor: '#002211', color: '#4ade80' }}>
-            🧒 kleine speler — −1 biertje
+            kleine speler, −1 klokje
           </button>
         </div>
         <p className="text-green-600 text-xs text-center -mt-1">
