@@ -427,11 +427,13 @@ export default function DashboardPage() {
                           <span className="text-xl">{medals[index] || `${index + 1}.`}</span>
                           <span className={`font-black text-base ${isMe ? 'text-yellow-400' : 'text-white'}`}>{user.name}</span>
                         </div>
-                        <div className="flex gap-2 mt-0.5 text-xs flex-wrap">
-                          <span className="text-green-300">🍺 {klokScore}p</span>
-                          <span className="text-red-300">💥 {adtScore}p</span>
-                          {wedstrijdScore > 0 && <span className="text-blue-300">⚽ {wedstrijdScore}p</span>}
-                        </div>
+                        {klokScore + adtScore <= user.total_points && (
+                          <div className="flex gap-2 mt-0.5 text-xs flex-wrap">
+                            {klokScore > 0 && <span className="text-green-300">🍺 {klokScore}p</span>}
+                            {adtScore > 0 && <span className="text-red-300">💥 {adtScore}p</span>}
+                            {wedstrijdScore > 0 && <span className="text-blue-300">⚽ {wedstrijdScore}p</span>}
+                          </div>
+                        )}
                       </div>
                       <div className="text-right">
                         <div className="text-yellow-400 font-black text-2xl">{user.total_points}</div>
