@@ -73,11 +73,11 @@ export default function StatsPage() {
     : null
 
   const awards = [
-    { titel: '👑 Koning der Klok', sub: 'meeste punten totaal', stat: koning, waarde: (s: SpelerStat) => `${s.user.total_points}p`, kleur: '#D4AF37' },
+    { titel: '👑 Koning Klok', sub: 'meeste punten totaal', stat: koning, waarde: (s: SpelerStat) => `${s.user.total_points}p`, kleur: '#D4AF37' },
     { titel: '🍺 Bierkoning(in)', sub: 'meeste klokjes', stat: leider('klokjes'), waarde: (s: SpelerStat) => `${s.klokjes}×`, kleur: '#4ade80' },
-    { titel: '💥 ADT-monster', sub: 'meeste adtjes', stat: leider('adts'), waarde: (s: SpelerStat) => `${s.adts}×`, kleur: '#f87171' },
+    { titel: '💥 WK-ADT Koning(in)', sub: 'meeste adtjes', stat: leider('adts'), waarde: (s: SpelerStat) => `${s.adts}×`, kleur: '#f87171' },
     { titel: '🔮 Het Orakel', sub: 'meeste exacte voorspellingen', stat: leider('exact'), waarde: (s: SpelerStat) => `${s.exact}×`, kleur: '#60a5fa' },
-    { titel: '🧠 Quizbaas', sub: 'meeste quizpunten', stat: leider('quiz'), waarde: (s: SpelerStat) => `${s.quiz}p`, kleur: '#a78bfa' },
+    { titel: '🧠 Quizmaster', sub: 'meeste quizpunten', stat: leider('quiz'), waarde: (s: SpelerStat) => `${s.quiz}p`, kleur: '#a78bfa' },
     { titel: '⚽ Bondscoach', sub: 'meeste voetbalpunten', stat: leider('voetbal'), waarde: (s: SpelerStat) => `${s.voetbal}p`, kleur: '#fb923c' },
   ]
 
