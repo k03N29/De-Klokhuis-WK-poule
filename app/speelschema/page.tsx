@@ -151,7 +151,7 @@ export default function SpeelschemaPage() {
             </div>
 
             <div className="space-y-2">
-              {dag.wedstrijden.map(w => {
+              {[...dag.wedstrijden].sort((a, b) => a.utcDatum.localeCompare(b.utcDatum)).map(w => {
                 const isNL = w.isNL ?? false
                 const isMijn = mijnLanden.has(w.thuis) || mijnLanden.has(w.uit)
                 const nacht = isNacht(w.utcDatum)

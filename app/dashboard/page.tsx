@@ -308,9 +308,15 @@ export default function DashboardPage() {
             kleine speler, −1 klokje
           </button>
         </div>
-        <p className="text-green-600 text-xs text-center -mt-1">
-          🍺 {currentUser.beers_drunk} klokjes • 💥 {currentUser.adts_drunk || 0} adtjes — alleen tijdens het WK
-        </p>
+        {(() => {
+          const totalKlokjes = allUsers.reduce((s, u) => s + (u.beers_drunk || 0), 0)
+          const totalAdts = allUsers.reduce((s, u) => s + (u.adts_drunk || 0), 0)
+          return (
+            <p className="text-green-600 text-xs text-center -mt-1">
+              Met z'n allen al 🍺 {totalKlokjes} klokjes en 💥 {totalAdts} adtjes gedronken — telt alleen tijdens het WK
+            </p>
+          )
+        })()}
 
         {/* Quiz banner — toont alleen als er een vraag is vandaag */}
         {todayQuiz && (

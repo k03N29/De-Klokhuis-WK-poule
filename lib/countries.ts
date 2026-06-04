@@ -103,27 +103,32 @@ export const getFlag = (team: string): string => FLAG_MAP[team] ?? '🏳️'
 export type NlPositie = 'aanvaller' | 'middenvelder' | 'verdediger'
 
 export const NL_SPELERS: { name: string; position: NlPositie }[] = [
-  // Verdedigers
-  { name: 'Virgil van Dijk',   position: 'verdediger' },
-  { name: 'Nathan Aké',        position: 'verdediger' },
-  { name: 'Matthijs de Ligt',  position: 'verdediger' },
-  { name: 'Denzel Dumfries',   position: 'verdediger' },
-  { name: 'Jurriën Timber',    position: 'verdediger' },
-  { name: 'Stefan de Vrij',    position: 'verdediger' },
-  // Middenvelders
-  { name: 'Frenkie de Jong',   position: 'middenvelder' },
-  { name: 'Tijjani Reijnders', position: 'middenvelder' },
-  { name: 'Teun Koopmeiners',  position: 'middenvelder' },
-  { name: 'Xavi Simons',       position: 'middenvelder' },
-  { name: 'Ryan Gravenberch',  position: 'middenvelder' },
-  { name: 'Joey Veerman',      position: 'middenvelder' },
-  // Aanvallers
-  { name: 'Memphis Depay',     position: 'aanvaller' },
-  { name: 'Cody Gakpo',        position: 'aanvaller' },
-  { name: 'Donyell Malen',     position: 'aanvaller' },
-  { name: 'Brian Brobbey',     position: 'aanvaller' },
-  { name: 'Wout Weghorst',     position: 'aanvaller' },
-  { name: 'Steven Bergwijn',   position: 'aanvaller' },
+  // Verdedigers (5p)
+  { name: 'Virgil van Dijk',      position: 'verdediger' },
+  { name: 'Nathan Aké',           position: 'verdediger' },
+  { name: 'Denzel Dumfries',      position: 'verdediger' },
+  { name: 'Jorrel Hato',          position: 'verdediger' },
+  { name: 'Jan Paul van Hecke',   position: 'verdediger' },
+  { name: 'Jurriën Timber',       position: 'verdediger' },
+  { name: 'Micky van de Ven',     position: 'verdediger' },
+  // Middenvelders (3p)
+  { name: 'Frenkie de Jong',      position: 'middenvelder' },
+  { name: 'Ryan Gravenberch',     position: 'middenvelder' },
+  { name: 'Teun Koopmeiners',     position: 'middenvelder' },
+  { name: 'Tijjani Reijnders',    position: 'middenvelder' },
+  { name: 'Justin Kluivert',      position: 'middenvelder' },
+  { name: 'Marten de Roon',       position: 'middenvelder' },
+  { name: 'Guus Til',             position: 'middenvelder' },
+  { name: 'Quinten Timber',       position: 'middenvelder' },
+  { name: 'Mats Wieffer',         position: 'middenvelder' },
+  // Aanvallers (1p)
+  { name: 'Brian Brobbey',        position: 'aanvaller' },
+  { name: 'Memphis Depay',        position: 'aanvaller' },
+  { name: 'Cody Gakpo',           position: 'aanvaller' },
+  { name: 'Noa Lang',             position: 'aanvaller' },
+  { name: 'Donyell Malen',        position: 'aanvaller' },
+  { name: 'Crysencio Summerville',position: 'aanvaller' },
+  { name: 'Wout Weghorst',        position: 'aanvaller' },
 ]
 
 export const NL_POSITIE_PUNTEN: Record<NlPositie, number> = {
