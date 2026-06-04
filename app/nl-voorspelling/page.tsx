@@ -183,7 +183,8 @@ export default function NlVoorspellingPage() {
           const scorerPred = getScorerPred(match.id)
           const scoreInp = getScoreInp(match.id)
           const scorerInp = getScorerInp(match.id)
-          const locked = match.predictions_locked
+          const kickoffPassed = match.match_date ? new Date(match.match_date) <= new Date() : false
+          const locked = match.predictions_locked || kickoffPassed
           const { nlFirst, opp } = getOpponent(match)
 
           return (

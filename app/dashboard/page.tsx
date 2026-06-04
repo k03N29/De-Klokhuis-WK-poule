@@ -380,6 +380,10 @@ export default function DashboardPage() {
             style={{ backgroundColor: '#003322', color: '#4ade80', border: '1px solid #006b3f' }}>
             📅 Speelschema
           </a>
+          <a href="/stats" className="py-3 rounded-xl text-center text-sm font-bold"
+            style={{ backgroundColor: '#2a1500', color: '#D4AF37', border: '1px solid #D4AF37' }}>
+            📊 Stats & Awards
+          </a>
           <a href="/spelregels" className="py-3 rounded-xl text-center text-sm font-bold col-span-2"
             style={{ backgroundColor: '#002211', color: '#6b7280', border: '1px solid #1f2937' }}>
             📋 Spelregels

@@ -135,7 +135,8 @@ export default function VoorspellingenPage() {
               {upcoming.map(match => {
                 const pred = getPred(match.id)
                 const inp = getInp(match.id)
-                const locked = match.predictions_locked
+                const kickoffPassed = match.match_date ? new Date(match.match_date) <= new Date() : false
+                const locked = match.predictions_locked || kickoffPassed
                 const justSaved = saved === match.id
 
                 return (

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
-import { PLAYERS, NL_SPELERS } from '@/lib/countries'
+import { PLAYERS, NL_SPELERS, WK_COUNTRIES } from '@/lib/countries'
 import type { User, Country, Match, GlobalState, ScheduledMatch } from '@/lib/types'
 import { Settings, Trophy, Flag, Zap, Timer, RefreshCw } from 'lucide-react'
 
@@ -53,6 +53,10 @@ export default function AdminPage() {
   const [draftMsg, setDraftMsg] = useState('')
   const [adMsg, setAdMsg] = useState('')
 
+  // WK winnaar
+  const [wkWinnerSel, setWkWinnerSel] = useState('')
+  const [wkWinnerMsg, setWkWinnerMsg] = useState('')
+
   const fetchData = useCallback(async () => {
     const [u, c, m, sm, gs, ng] = await Promise.all([
       supabase.from('users').select('*').order('total_points', { ascending: false }),
@@ -91,6 +95,18 @@ export default function AdminPage() {
   const saveMatch = async () => {
     if (!team1 || !team2) { setMatchMsg('Vul beide teamnamen in!'); return }
     const s1 = parseInt(score1), s2 = parseInt(score2)
+
+    // Dubbel-invoer check: bestaat deze wedstrijd al?
+    const alReedsIngevoerd = matches.some(m =>
+      ((m.team1 === team1 && m.team2 === team2) || (m.team1 === team2 && m.team2 === team1))
+    )
+    if (alReedsIngevoerd) {
+      if (!confirm(`⚠️ ${team1} – ${team2} lijkt al ingevoerd te zijn!\n\nAls je doorgaat krijgen de landeigenaren NOG een keer punten (dubbel).\n\nWeet je zeker dat je deze wedstrijd nogmaals wil verwerken?`)) {
+        setMatchMsg('Geannuleerd — geen dubbele punten uitgedeeld.')
+        setTimeout(() => setMatchMsg(''), 4000)
+        return
+      }
+    }
 
     const { data: match } = await supabase
       .from('matches')
@@ -156,6 +172,41 @@ export default function AdminPage() {
     setBonusMsg(`✅ +1 punt voor ${owner.name} (${country.flag_emoji} ${country.name})`)
     await fetchData()
     setTimeout(() => setBonusMsg(''), 3000)
+  }
+
+  const setWkWinner = async () => {
+    if (!wkWinnerSel) { setWkWinnerMsg('Kies eerst de wereldkampioen!'); return }
+    if (!confirm(`🏆 ${wkWinnerSel} als wereldkampioen instellen?\n\nIedereen die dit goed had voorspeld krijgt automatisch +30 punten.`)) return
+
+    // Zet de winnaar in global_state
+    await supabase.from('global_state').update({ wk_winner: wkWinnerSel }).eq('id', 1)
+
+    // Beloon iedereen die het goed had (en nog niet beloond is)
+    const { data: preds } = await supabase
+      .from('wk_winner_predictions')
+      .select('*')
+      .eq('predicted_country', wkWinnerSel)
+
+    const { data: freshUsers } = await supabase.from('users').select('*')
+    const currentUsers: User[] = freshUsers || []
+    let rewarded = 0
+
+    for (const pred of preds || []) {
+      if (pred.points_awarded >= 30) continue // al beloond
+      const user = currentUsers.find(u => u.id === pred.user_id)
+      if (!user) continue
+      await supabase.from('users').update({ total_points: user.total_points + 30 }).eq('id', user.id)
+      await supabase.from('wk_winner_predictions').update({ points_awarded: 30 }).eq('id', pred.id)
+      await supabase.from('point_events').insert({
+        user_id: user.id, points: 30,
+        reason: `🏆 WK-winnaar goed voorspeld: ${wkWinnerSel}!`,
+      })
+      rewarded++
+    }
+
+    setWkWinnerMsg(`✅ ${wkWinnerSel} is wereldkampioen! ${rewarded} speler(s) kregen +30p.`)
+    await fetchData()
+    setTimeout(() => setWkWinnerMsg(''), 6000)
   }
 
   const validatePredictions = async () => {
@@ -234,6 +285,14 @@ export default function AdminPage() {
     const s1 = parseInt(schedScore1)
     const s2 = parseInt(schedScore2)
     if (isNaN(s1) || isNaN(s2)) { setSchedMsg('Voer geldige scores in!'); return }
+
+    if (match.status === 'finished') {
+      if (!confirm(`⚠️ ${match.team1} – ${match.team2} is al afgesloten!\n\nReeds beloonde voorspellingen krijgen NIET nog een keer punten, maar nieuwe/gewijzigde wel.\n\nToch opnieuw verwerken?`)) {
+        setSchedMsg('Geannuleerd.')
+        setTimeout(() => setSchedMsg(''), 4000)
+        return
+      }
+    }
 
     // Update match score and status
     await supabase
@@ -592,6 +651,33 @@ export default function AdminPage() {
                 ⭐ Geef +1 Club Bonus
               </button>
             </div>
+
+            {/* WK WINNAAR — einde toernooi */}
+            <h2 className="text-yellow-400 font-black text-xl pt-2" style={{ fontFamily: 'Arial Black, Arial' }}>🏆 WK WINNAAR</h2>
+            <p className="text-green-300 text-sm">Aan het eind van het toernooi: kies de wereldkampioen. Iedereen die dit goed voorspeld had krijgt automatisch +30p.</p>
+            <div className="rounded-2xl p-4 space-y-3" style={{ backgroundColor: '#003322', border: '2px solid #D4AF37' }}>
+              {globalState?.wk_winner && (
+                <p className="text-yellow-400 font-bold text-sm">Huidige kampioen: 🏆 {globalState.wk_winner}</p>
+              )}
+              <select value={wkWinnerSel} onChange={e => setWkWinnerSel(e.target.value)}
+                className="w-full rounded-xl px-3 py-3 text-green-900 font-bold">
+                <option value="">Kies wereldkampioen...</option>
+                {WK_COUNTRIES.map(c => (
+                  <option key={c.name} value={c.name}>{c.flag} {c.name}</option>
+                ))}
+              </select>
+              {wkWinnerMsg && (
+                <div className="rounded-xl p-3 text-center font-bold text-sm"
+                  style={{ backgroundColor: wkWinnerMsg.startsWith('✅') ? '#004d2e' : '#5c0000', color: wkWinnerMsg.startsWith('✅') ? '#4ade80' : '#fca5a5' }}>
+                  {wkWinnerMsg}
+                </div>
+              )}
+              <button onClick={setWkWinner} className="w-full py-3 rounded-xl font-black"
+                style={{ backgroundColor: '#D4AF37', color: '#003322', fontFamily: 'Arial Black, Arial' }}>
+                🏆 Bekroon kampioen + deel +30p uit
+              </button>
+            </div>
+
             <h3 className="text-yellow-400 font-bold">📊 Huidige Stand</h3>
             <div className="space-y-2">
               {users.map((u, i) => (
