@@ -215,6 +215,26 @@ export default function NlVoorspellingPage() {
 
                 <div className="text-blue-400 text-xs text-center mb-4">📅 {formatDate(match.match_date)}</div>
 
+                {/* ─── SAMENVATTING: wat heb ik ingediend ─── */}
+                {!locked && (pred || scorerPred) && (
+                  <div className="rounded-xl px-3 py-2.5 mb-4 text-center"
+                    style={{ backgroundColor: '#052e16', border: '1px solid #16a34a' }}>
+                    <div className="text-green-400 text-xs font-black mb-1.5">✅ JOUW INGEDIENDE VOORSPELLING</div>
+                    <div className="text-white text-sm font-bold">
+                      Stand:{' '}
+                      {pred
+                        ? `${pred.predicted_score1} – ${pred.predicted_score2}`
+                        : <span className="text-green-700 font-normal">nog niet ingevuld</span>}
+                    </div>
+                    <div className="text-white text-sm">
+                      Scorers:{' '}
+                      {scorerPred
+                        ? `${scorerPred.scorer1_name} & ${scorerPred.scorer2_name}`
+                        : <span className="text-green-700">nog niet ingevuld</span>}
+                    </div>
+                  </div>
+                )}
+
                 {/* ─── SCORE VOORSPELLING ─── */}
                 <div className="rounded-xl p-3 mb-4"
                   style={{ backgroundColor: '#001a4d', border: '1px solid #003399' }}>
