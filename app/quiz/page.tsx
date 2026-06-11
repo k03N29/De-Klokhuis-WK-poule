@@ -238,7 +238,8 @@ function QuizCard({
             const style = getOptionStyle(opt)
             const label = opt === 'A' ? question.option_a : opt === 'B' ? question.option_b : question.option_c
             const isChosen = myAnswer?.chosen_option === opt
-            const isCorrect = revealed && question.correct_option === opt
+            // Pas onthullen NA het antwoorden — anders verklap je het juiste antwoord
+            const isCorrect = answered && revealed && question.correct_option === opt
 
             return (
               <button
