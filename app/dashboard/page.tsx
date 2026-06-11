@@ -104,12 +104,18 @@ export default function DashboardPage() {
     return () => clearInterval(interval)
   }, [fetchData])
 
-  const undoPoint = async () => {
-    if (!currentUser || beerLoading || currentUser.total_points <= 0) return
+  const undoDrink = async () => {
+    if (!currentUser || beerLoading) return
+    const beers = currentUser.beers_drunk || 0
+    const adts = currentUser.adts_drunk || 0
+    if (beers <= 0 && adts <= 0) return
     setBeerLoading(true)
-    await supabase.from('users').update({
-      total_points: currentUser.total_points - 1,
-    }).eq('id', currentUser.id)
+    // Haal laatste drankje terug: eerst een klokje (-1p), anders een adt (-2p).
+    // total_points nooit onder 0 (zelf-herstellend bij eerdere desync).
+    const update = beers > 0
+      ? { beers_drunk: beers - 1, total_points: Math.max(0, currentUser.total_points - 1) }
+      : { adts_drunk: adts - 1, total_points: Math.max(0, currentUser.total_points - 2) }
+    await supabase.from('users').update(update).eq('id', currentUser.id)
     await fetchData()
     setBeerLoading(false)
   }
@@ -302,7 +308,7 @@ export default function DashboardPage() {
         </div>
         {/* Undo misklikt */}
         <div className="flex justify-center -mt-1">
-          <button onClick={undoPoint} disabled={beerLoading || currentUser.total_points <= 0}
+          <button onClick={undoDrink} disabled={beerLoading || (currentUser.beers_drunk <= 0 && (currentUser.adts_drunk || 0) <= 0)}
             className="text-xs py-1 px-3 rounded-lg active:scale-95 transition-all disabled:opacity-30"
             style={{ backgroundColor: '#002211', color: '#4ade80' }}>
             kleine speler, −1 klokje
