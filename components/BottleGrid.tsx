@@ -15,7 +15,7 @@ export default function BottleGrid({ points, bottleSize = 64 }: BottleGridProps)
   const kratBottleSize = Math.round(bottleSize * 0.65)
 
   if (points === 0) {
-    return <p className="text-gray-500 text-sm italic py-1">Nog geen punten...</p>
+    return <p className="text-gray-500 text-sm italic py-1">Nog niks gedronken...</p>
   }
 
   return (

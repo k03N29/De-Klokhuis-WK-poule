@@ -451,9 +451,9 @@ export default function DashboardPage() {
                       </div>
                     </div>
                   </div>
-                  {/* Flesjes */}
+                  {/* Flesjes — alleen wat er echt gedronken is (klokjes + adtjes) */}
                   <div className="px-3 py-3" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-                    <BottleGrid points={user.total_points} />
+                    <BottleGrid points={user.beers_drunk + (user.adts_drunk || 0)} />
                   </div>
                 </div>
               )
