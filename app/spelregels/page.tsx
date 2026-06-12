@@ -89,7 +89,7 @@ export default function SpelregelsPage() {
             Elke speeldag staat er een wedstrijd klaar om te voorspellen.
             Vul de stand in vóór de wedstrijd begint.
           </p>
-          <ScoreRow emoji="⚡" label="Uitslag exact goed" points="+5p" desc="+ je mag een ADT uitdelen aan iedereen!" />
+          <ScoreRow emoji="⚡" label="Uitslag exact goed" points="+5p" desc="+ je mag een ADT uitdelen (1 week geldig)!" />
           <ScoreRow emoji="✅" label="Winnaar goed (maar stand klopt niet)" points="+2p" />
           <ScoreRow emoji="❌" label="Fout" points="0p" />
         </Section>
@@ -146,10 +146,10 @@ export default function SpelregelsPage() {
 
         <Section emoji="💥" title="ADT UITDELEN" color="#3d0000" borderColor="#FFD700">
           <p className="text-yellow-300 text-sm mb-2">
-            Heb je een wedstrijd <strong>exact goed voorspeld?</strong> Dan mag jij een ADT uitdelen aan iedereen.
+            Heb je een wedstrijd <strong>exact goed voorspeld?</strong> Dan krijg je het recht om één ADT uit te delen.
           </p>
           <p className="text-yellow-600 text-xs">
-            Een overlay verschijnt op ieders scherm met jouw naam. Iedereen adtet, jij lacht.
+            Jij kiest zelf wanneer en aan wie je 'm geeft (of aan iedereen) — het recht blijft <strong>1 week</strong> geldig.
           </p>
         </Section>
 

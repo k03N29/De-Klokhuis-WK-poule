@@ -12,6 +12,8 @@ export default function VoorspellingenPage() {
   const [currentUser, setCurrentUser] = useState<User | null>(null)
   const [matches, setMatches] = useState<ScheduledMatch[]>([])
   const [myPredictions, setMyPredictions] = useState<ScheduledPrediction[]>([])
+  const [allPredictions, setAllPredictions] = useState<ScheduledPrediction[]>([])
+  const [allUsers, setAllUsers] = useState<Pick<User, 'id' | 'name'>[]>([])
   const [inputs, setInputs] = useState<Record<number, { s1: string; s2: string }>>({})
   const [saving, setSaving] = useState<number | null>(null)
   const [saved, setSaved] = useState<number | null>(null)
@@ -24,7 +26,7 @@ export default function VoorspellingenPage() {
 
   const fetchData = useCallback(async () => {
     if (!currentUser) return
-    const [matchesRes, predsRes] = await Promise.all([
+    const [matchesRes, predsRes, allPredsRes, usersRes] = await Promise.all([
       supabase
         .from('scheduled_matches')
         .select('*')
@@ -34,15 +36,45 @@ export default function VoorspellingenPage() {
         .from('scheduled_predictions')
         .select('*')
         .eq('user_id', currentUser.id),
+      supabase.from('scheduled_predictions').select('*'),
+      supabase.from('users').select('id, name'),
     ])
     if (matchesRes.data) setMatches(matchesRes.data)
     if (predsRes.data) setMyPredictions(predsRes.data)
+    if (allPredsRes.data) setAllPredictions(allPredsRes.data)
+    if (usersRes.data) setAllUsers(usersRes.data)
   }, [currentUser])
 
   useEffect(() => { fetchData() }, [fetchData])
 
   const getPred = (matchId: number) => myPredictions.find(p => p.match_id === matchId)
   const getInp = (matchId: number) => inputs[matchId] || { s1: '', s2: '' }
+
+  // Ieders voorspelling — alleen tonen bij wedstrijden die op slot zitten (na aftrap)
+  const renderIeders = (matchId: number) => {
+    const lijst = allPredictions
+      .filter(p => p.match_id === matchId)
+      .map(p => ({
+        naam: allUsers.find(u => u.id === p.user_id)?.name ?? '?',
+        s1: p.predicted_score1, s2: p.predicted_score2,
+        isMe: p.user_id === currentUser?.id,
+      }))
+      .sort((a, b) => a.naam.localeCompare(b.naam))
+    if (lijst.length === 0) return null
+    return (
+      <div className="mt-3 pt-2" style={{ borderTop: '1px solid #006b3f' }}>
+        <div className="text-green-500 text-xs font-bold mb-1.5">👀 Ieders voorspelling</div>
+        <div className="grid grid-cols-2 gap-x-3 gap-y-1">
+          {lijst.map((x, i) => (
+            <div key={i} className="flex justify-between text-xs">
+              <span className="truncate" style={{ color: x.isMe ? '#D4AF37' : '#9ca3af' }}>{x.isMe ? '⭐ ' : ''}{x.naam}</span>
+              <span className="font-bold ml-1" style={{ color: x.isMe ? '#D4AF37' : '#cbd5e1' }}>{x.s1}–{x.s2}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   const setInp = (matchId: number, key: 's1' | 's2', val: string) => {
     if (val !== '' && (isNaN(Number(val)) || Number(val) < 0)) return
@@ -227,6 +259,8 @@ export default function VoorspellingenPage() {
                           </div>
                         </div>
                       )}
+
+                      {locked && renderIeders(match.id)}
                     </div>
                   </div>
                 )
@@ -271,6 +305,7 @@ export default function VoorspellingenPage() {
                         Jij: {pred.predicted_score1} – {pred.predicted_score2}
                       </div>
                     )}
+                    {renderIeders(match.id)}
                   </div>
                 )
               })}

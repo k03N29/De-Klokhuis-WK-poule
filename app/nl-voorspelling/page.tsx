@@ -13,6 +13,9 @@ export default function NlVoorspellingPage() {
   const [matches, setMatches] = useState<ScheduledMatch[]>([])
   const [myPredictions, setMyPredictions] = useState<ScheduledPrediction[]>([])
   const [myScorerPreds, setMyScorerPreds] = useState<NlScorerPrediction[]>([])
+  const [allPredictions, setAllPredictions] = useState<ScheduledPrediction[]>([])
+  const [allScorerPreds, setAllScorerPreds] = useState<NlScorerPrediction[]>([])
+  const [allUsers, setAllUsers] = useState<Pick<User, 'id' | 'name'>[]>([])
   const [scoreInputs, setScoreInputs] = useState<Record<number, { s1: string; s2: string }>>({})
   const [scorerInputs, setScorerInputs] = useState<Record<number, { s1: string; s2: string }>>({})
   const [saving, setSaving] = useState<number | null>(null)
@@ -28,14 +31,20 @@ export default function NlVoorspellingPage() {
 
   const fetchData = useCallback(async () => {
     if (!currentUser) return
-    const [matchesRes, predsRes, scorerRes] = await Promise.all([
+    const [matchesRes, predsRes, scorerRes, allPredsRes, allScorerRes, usersRes] = await Promise.all([
       supabase.from('scheduled_matches').select('*').eq('is_nl_match', true).order('match_date', { ascending: true }),
       supabase.from('scheduled_predictions').select('*').eq('user_id', currentUser.id),
       supabase.from('nl_scorer_predictions').select('*').eq('user_id', currentUser.id),
+      supabase.from('scheduled_predictions').select('*'),
+      supabase.from('nl_scorer_predictions').select('*'),
+      supabase.from('users').select('id, name'),
     ])
     if (matchesRes.data) setMatches(matchesRes.data)
     if (predsRes.data) setMyPredictions(predsRes.data)
     if (scorerRes.data) setMyScorerPreds(scorerRes.data)
+    if (allPredsRes.data) setAllPredictions(allPredsRes.data)
+    if (allScorerRes.data) setAllScorerPreds(allScorerRes.data)
+    if (usersRes.data) setAllUsers(usersRes.data)
   }, [currentUser])
 
   useEffect(() => { fetchData() }, [fetchData])
@@ -45,6 +54,38 @@ export default function NlVoorspellingPage() {
 
   const getScoreInp = (matchId: number) => scoreInputs[matchId] || { s1: '', s2: '' }
   const getScorerInp = (matchId: number) => scorerInputs[matchId] || { s1: '', s2: '' }
+
+  // Ieders voorspelling (stand + scorers) — alleen bij wedstrijden die op slot zitten
+  const renderIedersNl = (matchId: number) => {
+    const lijst = allUsers.map(u => {
+      const sp = allPredictions.find(p => p.match_id === matchId && p.user_id === u.id)
+      const scp = allScorerPreds.find(p => p.match_id === matchId && p.user_id === u.id)
+      if (!sp && !scp) return null
+      return {
+        naam: u.name, isMe: u.id === currentUser?.id,
+        score: sp ? `${sp.predicted_score1}–${sp.predicted_score2}` : '—',
+        scorers: scp ? `${scp.scorer1_name}, ${scp.scorer2_name}` : null,
+      }
+    }).filter(Boolean) as { naam: string; isMe: boolean; score: string; scorers: string | null }[]
+    if (lijst.length === 0) return null
+    lijst.sort((a, b) => a.naam.localeCompare(b.naam))
+    return (
+      <div className="rounded-xl p-3 mt-4" style={{ backgroundColor: '#001a4d', border: '1px solid #003399' }}>
+        <div className="text-orange-300 text-xs font-bold mb-2 text-center">👀 IEDERS VOORSPELLING</div>
+        <div className="space-y-1.5">
+          {lijst.map((x, i) => (
+            <div key={i} className="text-xs" style={{ color: x.isMe ? '#FF8833' : '#cbd5e1' }}>
+              <div className="flex justify-between">
+                <span className="font-bold">{x.isMe ? '⭐ ' : ''}{x.naam}</span>
+                <span className="font-black">{x.score}</span>
+              </div>
+              {x.scorers && <div className="text-blue-400">⚽ {x.scorers}</div>}
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   const setScoreInp = (matchId: number, key: 's1' | 's2', val: string) => {
     if (val !== '' && (isNaN(Number(val)) || Number(val) < 0)) return
@@ -371,6 +412,8 @@ export default function NlVoorspellingPage() {
                     </div>
                   )}
                 </div>
+
+                {locked && renderIedersNl(match.id)}
               </div>
             </div>
           )
@@ -412,6 +455,7 @@ export default function NlVoorspellingPage() {
                         )}
                       </div>
                     )}
+                    {renderIedersNl(match.id)}
                   </div>
                 )
               })}

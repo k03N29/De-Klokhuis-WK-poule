@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase'
 import BottleGrid from '@/components/BottleGrid'
 import AlertOverlay from '@/components/AlertOverlay'
 import KlokFlesje from '@/components/KlokFlesje'
-import type { User, Country, GlobalState, ScheduledPrediction, QuizQuestion, QuizAnswer, PointEvent } from '@/lib/types'
+import type { User, Country, GlobalState, ScheduledPrediction, ScheduledMatch, QuizQuestion, QuizAnswer, PointEvent } from '@/lib/types'
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -20,6 +20,7 @@ export default function DashboardPage() {
   const [adtLoading, setAdtLoading] = useState(false)
   const [avatarUploading, setAvatarUploading] = useState(false)
   const [myPendingAdts, setMyPendingAdts] = useState<ScheduledPrediction[]>([])
+  const [matchesById, setMatchesById] = useState<Record<number, ScheduledMatch>>({})
   const [todayQuiz, setTodayQuiz] = useState<QuizQuestion | null>(null)
   const [myQuizAnswer, setMyQuizAnswer] = useState<QuizAnswer | null>(null)
   const [allCountries, setAllCountries] = useState<Country[]>([])
@@ -74,6 +75,14 @@ export default function DashboardPage() {
       setGlobalState(gs)
     }
     if (predsRes.data) setMyPendingAdts(predsRes.data)
+
+    // Wedstrijden ophalen (voor de 1-week vervaldatum van ADT-rechten)
+    const { data: smData } = await supabase.from('scheduled_matches').select('*')
+    if (smData) {
+      const map: Record<number, ScheduledMatch> = {}
+      for (const m of smData as ScheduledMatch[]) map[m.id] = m
+      setMatchesById(map)
+    }
 
     // Landen punten (wedstrijdresultaten)
     const { data: pointsData } = await supabase
@@ -144,14 +153,19 @@ export default function DashboardPage() {
     setAdtLoading(false)
   }
 
-  const deelAdtUit = async (predId: number) => {
-    await supabase.from('global_state').update({
-      adt_uitdeel_active: true,
-      adt_uitdeel_by_user_id: currentUser?.id,
-    }).eq('id', 1)
+  const markAdtUsed = async (predId: number) => {
+    // Alleen markeren als gebruikt — geen automatische 'iedereen moet'-melding meer.
     await supabase.from('scheduled_predictions').update({ adt_uitgedeeld: true }).eq('id', predId)
     await fetchData()
   }
+
+  // ADT-rechten die nog geldig zijn (binnen 1 week na de wedstrijd)
+  const geldigeAdts = myPendingAdts.filter(pred => {
+    const m = matchesById[pred.match_id]
+    if (!m?.match_date) return true
+    const verval = new Date(new Date(m.match_date).getTime() + 7 * 24 * 60 * 60 * 1000)
+    return new Date() <= verval
+  })
 
   const dismissAlert = async (key: string) => {
     setDismissed(d => ({ ...d, [key]: true }))
@@ -266,17 +280,38 @@ export default function DashboardPage() {
 
       <div className="px-4 pt-5 space-y-5">
 
-        {/* ADT uitdelen knop (als je een exacte voorspelling had) */}
-        {myPendingAdts.length > 0 && (
+        {/* ADT-recht (als je een uitslag exact goed had) */}
+        {geldigeAdts.length > 0 && (
           <div className="rounded-2xl p-4 space-y-2" style={{ backgroundColor: '#8B0000', border: '2px solid #FFD700' }}>
-            <p className="text-yellow-300 font-black text-center">🎯 Exacte voorspelling! Deel een ADT uit:</p>
-            {myPendingAdts.map(pred => (
-              <button key={pred.id} onClick={() => deelAdtUit(pred.id)}
-                className="w-full py-3 rounded-xl font-black text-lg active:scale-95 transition-all"
-                style={{ backgroundColor: '#FFD700', color: '#3D0000', fontFamily: 'Arial Black, Arial' }}>
-                💥 DEEL ADT UIT AAN IEDEREEN!
-              </button>
-            ))}
+            <p className="text-yellow-300 font-black text-center">🎯 Exact goed voorspeld!</p>
+            <p className="text-yellow-100 text-sm text-center">
+              Je mag een ADT uitdelen — jij kiest zelf wanneer en aan wie (of aan iedereen).
+            </p>
+            {geldigeAdts.map(pred => {
+              const m = matchesById[pred.match_id]
+              const verval = m?.match_date
+                ? new Date(new Date(m.match_date).getTime() + 7 * 24 * 60 * 60 * 1000)
+                : null
+              return (
+                <div key={pred.id} className="space-y-1">
+                  {m && (
+                    <p className="text-yellow-200 text-xs text-center">
+                      Verdiend met {m.team1} – {m.team2}
+                    </p>
+                  )}
+                  <button onClick={() => markAdtUsed(pred.id)}
+                    className="w-full py-3 rounded-xl font-black text-base active:scale-95 transition-all"
+                    style={{ backgroundColor: '#FFD700', color: '#3D0000', fontFamily: 'Arial Black, Arial' }}>
+                    ✅ Ik heb mijn ADT uitgedeeld
+                  </button>
+                  {verval && (
+                    <p className="text-yellow-200 text-xs text-center">
+                      ⏳ geldig t/m {verval.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' })}
+                    </p>
+                  )}
+                </div>
+              )
+            })}
           </div>
         )}
 
