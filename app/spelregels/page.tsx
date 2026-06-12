@@ -149,7 +149,7 @@ export default function SpelregelsPage() {
             Heb je een wedstrijd <strong>exact goed voorspeld?</strong> Dan krijg je het recht om één ADT uit te delen.
           </p>
           <p className="text-yellow-600 text-xs">
-            Jij kiest zelf wanneer en aan wie je 'm geeft (of aan iedereen) — het recht blijft <strong>1 week</strong> geldig.
+            Jij kiest zelf wanneer en aan welke speler je 'm geeft — het recht blijft <strong>1 week</strong> geldig.
           </p>
         </Section>
 

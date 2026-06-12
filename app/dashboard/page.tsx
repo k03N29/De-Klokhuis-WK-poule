@@ -285,7 +285,7 @@ export default function DashboardPage() {
           <div className="rounded-2xl p-4 space-y-2" style={{ backgroundColor: '#8B0000', border: '2px solid #FFD700' }}>
             <p className="text-yellow-300 font-black text-center">🎯 Exact goed voorspeld!</p>
             <p className="text-yellow-100 text-sm text-center">
-              Je mag een ADT uitdelen — jij kiest zelf wanneer en aan wie (of aan iedereen).
+              Je mag een ADT uitdelen aan één speler — jij kiest zelf wanneer en aan wie.
             </p>
             {geldigeAdts.map(pred => {
               const m = matchesById[pred.match_id]
