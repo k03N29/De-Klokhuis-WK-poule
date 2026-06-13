@@ -153,12 +153,12 @@ export default function SpelregelsPage() {
           </p>
         </Section>
 
-        <Section emoji="⏱️" title="GELIJKE STAND = ADT-WEDSTRIJD" color="#003322">
+        <Section emoji="⏱️" title="GELIJKE EINDSTAND = ADT-WEDSTRIJD" color="#003322">
           <BigRule>
-            Eindigt een wedstrijd gelijk? Dan <strong style={{ color: '#D4AF37' }}>ADT voor iedereen.</strong>
+            Staan er aan het <strong>einde van het toernooi</strong> twee of meer spelers <strong style={{ color: '#D4AF37' }}>gelijk bovenaan?</strong> Dan beslist een ADT-wedstrijd wie de poule wint.
           </BigRule>
           <p className="text-green-600 text-xs text-center mt-2 italic">
-            Gaat toch niet gebeuren.
+            Eerste die z'n klokje leeg heeft is de Klokhuis-kampioen 🏆
           </p>
         </Section>
 
