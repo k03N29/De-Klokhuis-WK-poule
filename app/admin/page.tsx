@@ -119,14 +119,20 @@ export default function AdminPage() {
     const { data: freshUsers } = await supabase.from('users').select('*')
     const currentUsers: User[] = freshUsers || []
 
+    // Tolerante naamvergelijking: negeer hoofdletters, spaties en accent-codering
+    const norm = (s: string) => (s || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+    const nTeam1 = norm(team1), nTeam2 = norm(team2)
+
     const winnerName = s1 > s2 ? team1 : s2 > s1 ? team2 : null
+    const nWinner = winnerName ? norm(winnerName) : null
     const isDraw = s1 === s2
     let houseWon = false
 
     for (const country of countries) {
-      if (country.name !== team1 && country.name !== team2) continue
+      const nCountry = norm(country.name)
+      if (nCountry !== nTeam1 && nCountry !== nTeam2) continue
 
-      const isWinner = winnerName === country.name
+      const isWinner = nWinner === nCountry
       const pts = isWinner ? 3 : isDraw ? 1 : 0
       if (pts === 0) continue
 
