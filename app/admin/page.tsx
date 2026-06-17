@@ -134,7 +134,6 @@ export default function AdminPage() {
 
       const isWinner = nWinner === nCountry
       const pts = isWinner ? 3 : isDraw ? 1 : 0
-      if (pts === 0) continue
 
       if (!country.owner_id) {
         // Huis-land wint
@@ -145,13 +144,18 @@ export default function AdminPage() {
       const owner = currentUsers.find(u => u.id === country.owner_id)
       if (!owner) continue
 
-      await supabase.from('users')
-        .update({ total_points: owner.total_points + pts })
-        .eq('id', owner.id)
+      // Punten bijschrijven (alleen bij winst/gelijk)
+      if (pts > 0) {
+        await supabase.from('users')
+          .update({ total_points: owner.total_points + pts })
+          .eq('id', owner.id)
+      }
 
+      // Logregel voor ELKE gespeelde wedstrijd — ook verlies (0p), zodat het zichtbaar is
+      const uitslagWoord = isWinner ? 'wint' : isDraw ? 'gelijkspel' : 'verliest'
       await supabase.from('point_events').insert({
         user_id: owner.id, points: pts,
-        reason: `⚽ ${country.name} ${isWinner ? 'wint' : 'gelijkspel'} (${s1}-${s2})`,
+        reason: `⚽ ${country.name} ${uitslagWoord} (${s1}-${s2})`,
       })
     }
 

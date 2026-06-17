@@ -526,8 +526,10 @@ export default function DashboardPage() {
                           <div className="mt-1 space-y-0.5">
                             {countryEvents.map(e => (
                               <div key={e.id} className="flex justify-between items-center text-xs">
-                                <span className="text-green-300">{e.reason.replace('⚽ ', '')}</span>
-                                <span className="text-yellow-400 font-black ml-2">+{e.points}p</span>
+                                <span style={{ color: e.points > 0 ? '#86efac' : '#9ca3af' }}>{e.reason.replace('⚽ ', '')}</span>
+                                <span className="font-black ml-2" style={{ color: e.points > 0 ? '#facc15' : '#9ca3af' }}>
+                                  {e.points > 0 ? `+${e.points}p` : '0p'}
+                                </span>
                               </div>
                             ))}
                           </div>
