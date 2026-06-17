@@ -293,7 +293,7 @@ export default function AdminPage() {
     if (isNaN(s1) || isNaN(s2)) { setSchedMsg('Voer geldige scores in!'); return }
 
     if (match.status === 'finished') {
-      if (!confirm(`⚠️ ${match.team1} – ${match.team2} is al afgesloten!\n\nReeds beloonde voorspellingen krijgen NIET nog een keer punten, maar nieuwe/gewijzigde wel.\n\nToch opnieuw verwerken?`)) {
+      if (!confirm(`${match.team1} – ${match.team2} is al verwerkt.\n\nOpnieuw verwerken is veilig: punten worden nooit dubbel uitgedeeld, alleen aangevuld of bijgesteld als de uitslag anders is.\n\nDoorgaan?`)) {
         setSchedMsg('Geannuleerd.')
         setTimeout(() => setSchedMsg(''), 4000)
         return
@@ -306,12 +306,11 @@ export default function AdminPage() {
       .update({ score1: s1, score2: s2, status: 'finished', predictions_locked: true })
       .eq('id', match.id)
 
-    // Fetch all predictions for this match
+    // ALLE voorspellingen voor deze wedstrijd ophalen (niet alleen onbewerkte)
     const { data: preds } = await supabase
       .from('scheduled_predictions')
       .select('*')
       .eq('match_id', match.id)
-      .eq('points_awarded', 0) // only unscored
 
     if (!preds?.length) {
       setSchedMsg('✅ Scores opgeslagen. Geen openstaande voorspellingen.')
@@ -333,30 +332,35 @@ export default function AdminPage() {
         pred.predicted_score1 < pred.predicted_score2 ? 'L' : 'D'
       const isExact = pred.predicted_score1 === s1 && pred.predicted_score2 === s2
       const isToto = !isExact && predResult === actualResult
-      const pts = isExact ? exactPts : isToto ? totoPts : 0
+      const correctPts = isExact ? exactPts : isToto ? totoPts : 0
+      const already = pred.points_awarded || 0
+      const delta = correctPts - already
 
-      // Always update points_awarded (even 0 = "processed")
+      // Idempotent: alleen iets doen als wat al toegekend is afwijkt van wat het hoort te zijn.
+      if (delta === 0) continue
+
       await supabase.from('scheduled_predictions')
-        .update({ points_awarded: pts })
+        .update({ points_awarded: correctPts })
         .eq('id', pred.id)
-
-      if (pts === 0) continue
 
       const user = currentUsers.find(u => u.id === pred.user_id)
       if (!user) continue
 
       await supabase.from('users')
-        .update({ total_points: user.total_points + pts })
+        .update({ total_points: user.total_points + delta })
         .eq('id', pred.user_id)
 
-      await supabase.from('point_events').insert({
-        user_id: pred.user_id,
-        points: pts,
-        reason: isExact
-          ? `🎯 Exact: ${match.team1} ${s1}–${s2} ${match.team2} (+${pts}p)`
-          : `✅ Toto: ${match.team1} ${s1}–${s2} ${match.team2} (+${pts}p)`,
-      })
-      rewarded++
+      // Logregel alleen bij een (bij)betaling, niet bij correctie omlaag
+      if (delta > 0) {
+        await supabase.from('point_events').insert({
+          user_id: pred.user_id,
+          points: delta,
+          reason: isExact
+            ? `🎯 Exact: ${match.team1} ${s1}–${s2} ${match.team2} (+${delta}p)`
+            : `✅ Toto: ${match.team1} ${s1}–${s2} ${match.team2} (+${delta}p)`,
+        })
+        rewarded++
+      }
     }
 
     setSchedMsg(`✅ Verwerkt! ${rewarded}/${preds.length} speler(s) beloond.`)

@@ -21,13 +21,13 @@ export default function QuizPage() {
 
   const fetchData = useCallback(async () => {
     if (!currentUser) return
-    const today = new Date().toISOString().split('T')[0]
+    // Datum in NL-tijd — de vraag van vandaag, oude vragen verdwijnen na hun dag
+    const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Amsterdam' })
     const [qRes, aRes] = await Promise.all([
       supabase
         .from('quiz_questions')
         .select('*')
-        .lte('question_date', today)
-        .order('question_date', { ascending: false }),
+        .eq('question_date', today),
       supabase
         .from('quiz_answers')
         .select('*')
@@ -79,13 +79,12 @@ export default function QuizPage() {
   }
 
   const isToday = (dateStr: string) => {
-    return dateStr === new Date().toISOString().split('T')[0]
+    return dateStr === new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Amsterdam' })
   }
 
   if (!currentUser) return null
 
   const today = questions.find(q => isToday(q.question_date))
-  const past = questions.filter(q => !isToday(q.question_date))
   const totalQuizPts = myAnswers.reduce((s, a) => s + a.points_awarded, 0)
 
   return (
@@ -145,34 +144,9 @@ export default function QuizPage() {
           </div>
         )}
 
-        {/* Past questions */}
-        {past.length > 0 && (
-          <div>
-            <h2 className="text-yellow-400 font-black text-xs uppercase tracking-widest mb-3 flex items-center gap-2">
-              <CheckCircle className="w-3.5 h-3.5" /> Eerdere vragen
-            </h2>
-            <div className="space-y-3">
-              {past.map(q => (
-                <QuizCard
-                  key={q.id}
-                  question={q}
-                  myAnswer={getMyAnswer(q.id)}
-                  onAnswer={(opt) => submitAnswer(q, opt)}
-                  submitting={submitting === q.id}
-                  highlight={false}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {questions.length === 0 && (
-          <div className="text-center py-16">
-            <div className="text-5xl mb-3">🧠</div>
-            <div className="text-purple-600 text-sm">Quiz begint op 11 juni 2026</div>
-            <div className="text-purple-800 text-xs mt-1">Elke speeldag een nieuwe vraag</div>
-          </div>
-        )}
+        <p className="text-purple-700 text-xs text-center pt-2">
+          ⏳ Elke vraag is maar 1 dag geldig — log dagelijks in om geen punt te missen!
+        </p>
       </div>
     </div>
   )
