@@ -96,6 +96,7 @@ export const FLAG_MAP: Record<string, string> = {
   'Congo': '🇨🇩',
   'Tunesië': '🇹🇳',
   'Noorwegen': '🇳🇴',
+  'Kaapverdië': '🇨🇻',
 }
 
 export const getFlag = (team: string): string => FLAG_MAP[team] ?? '🏳️'
