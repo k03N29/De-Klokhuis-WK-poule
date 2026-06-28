@@ -12,6 +12,7 @@ export interface Country {
   name: string
   flag_emoji: string
   owner_id: string | null
+  eliminated?: boolean
 }
 
 export interface Match {

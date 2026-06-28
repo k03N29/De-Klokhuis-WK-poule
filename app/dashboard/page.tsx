@@ -515,31 +515,39 @@ export default function DashboardPage() {
                   e.reason.includes(country.name)
                 )
                 const totalPts = countryEvents.reduce((sum, e) => sum + e.points, 0)
+                const uit = country.eliminated ?? false
                 return (
                   <div key={country.id} className="rounded-2xl p-4"
-                    style={{ backgroundColor: '#006b3f', border: '1px solid #00804a' }}>
+                    style={{
+                      backgroundColor: uit ? '#1f2937' : '#006b3f',
+                      border: uit ? '1px solid #374151' : '1px solid #00804a',
+                      opacity: uit ? 0.75 : 1,
+                    }}>
                     <div className="flex items-center gap-3">
-                      <div className="text-4xl">{country.flag_emoji}</div>
+                      <div className="text-4xl" style={{ filter: uit ? 'grayscale(1)' : 'none' }}>{country.flag_emoji}</div>
                       <div className="flex-1">
-                        <div className="text-white font-bold text-base">{country.name}</div>
+                        <div className="font-bold text-base" style={{ color: uit ? '#9ca3af' : 'white' }}>{country.name}</div>
+                        {uit && (
+                          <div className="text-gray-400 text-xs mt-0.5">🪦 Uitgeschakeld — geen punten meer te verdienen</div>
+                        )}
                         {countryEvents.length > 0 ? (
                           <div className="mt-1 space-y-0.5">
                             {countryEvents.map(e => (
                               <div key={e.id} className="flex justify-between items-center text-xs">
-                                <span style={{ color: e.points > 0 ? '#86efac' : '#9ca3af' }}>{e.reason.replace('⚽ ', '')}</span>
-                                <span className="font-black ml-2" style={{ color: e.points > 0 ? '#facc15' : '#9ca3af' }}>
+                                <span style={{ color: uit ? '#6b7280' : (e.points > 0 ? '#86efac' : '#9ca3af') }}>{e.reason.replace('⚽ ', '')}</span>
+                                <span className="font-black ml-2" style={{ color: uit ? '#6b7280' : (e.points > 0 ? '#facc15' : '#9ca3af') }}>
                                   {e.points > 0 ? `+${e.points}p` : '0p'}
                                 </span>
                               </div>
                             ))}
                           </div>
                         ) : (
-                          <div className="text-green-600 text-xs mt-1">Nog geen wedstrijden gespeeld</div>
+                          <div className="text-xs mt-1" style={{ color: uit ? '#6b7280' : '#16a34a' }}>Nog geen wedstrijden gespeeld</div>
                         )}
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <div className="text-yellow-400 font-black text-xl">{totalPts}</div>
-                        <div className="text-green-500 text-xs">punten</div>
+                        <div className="font-black text-xl" style={{ color: uit ? '#9ca3af' : '#facc15' }}>{totalPts}</div>
+                        <div className="text-xs" style={{ color: uit ? '#6b7280' : '#22c55e' }}>punten</div>
                       </div>
                     </div>
                   </div>

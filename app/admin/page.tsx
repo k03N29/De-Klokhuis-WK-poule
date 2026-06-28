@@ -184,6 +184,11 @@ export default function AdminPage() {
     setTimeout(() => setBonusMsg(''), 3000)
   }
 
+  const toggleEliminated = async (country: Country) => {
+    await supabase.from('countries').update({ eliminated: !country.eliminated }).eq('id', country.id)
+    await fetchData()
+  }
+
   const setWkWinner = async () => {
     if (!wkWinnerSel) { setWkWinnerMsg('Kies eerst de wereldkampioen!'); return }
     if (!confirm(`🏆 ${wkWinnerSel} als wereldkampioen instellen?\n\nIedereen die dit goed had voorspeld krijgt automatisch +30 punten.`)) return
@@ -690,6 +695,28 @@ export default function AdminPage() {
                 style={{ backgroundColor: '#D4AF37', color: '#003322', fontFamily: 'Arial Black, Arial' }}>
                 🏆 Bekroon kampioen + deel +30p uit
               </button>
+            </div>
+
+            {/* LANDEN UITSCHAKELEN — knock-out fase */}
+            <h2 className="text-yellow-400 font-black text-xl pt-2" style={{ fontFamily: 'Arial Black, Arial' }}>🪦 LANDEN UITSCHAKELEN</h2>
+            <p className="text-green-300 text-sm">Land uit de knock-out? Zet 'm op uitgeschakeld — dan wordt 'ie grijs op het dashboard en verdient hij geen punten meer.</p>
+            <div className="space-y-2">
+              {countries.filter(c => c.owner_id).map(c => {
+                const owner = users.find(u => u.id === c.owner_id)
+                return (
+                  <div key={c.id} className="rounded-xl px-3 py-2 flex items-center justify-between"
+                    style={{ backgroundColor: c.eliminated ? '#1f2937' : '#004d2e' }}>
+                    <span className="text-sm" style={{ color: c.eliminated ? '#9ca3af' : 'white' }}>
+                      {c.eliminated ? '🪦 ' : ''}{c.flag_emoji} {c.name} <span className="text-green-600">→ {owner?.name}</span>
+                    </span>
+                    <button onClick={() => toggleEliminated(c)}
+                      className="text-xs font-bold px-3 py-1.5 rounded-lg flex-shrink-0"
+                      style={{ backgroundColor: c.eliminated ? '#065f46' : '#7f1d1d', color: 'white' }}>
+                      {c.eliminated ? '↩ Terugzetten' : '🪦 Uitschakelen'}
+                    </button>
+                  </div>
+                )
+              })}
             </div>
 
             <h3 className="text-yellow-400 font-bold">📊 Huidige Stand</h3>
