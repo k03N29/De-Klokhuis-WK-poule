@@ -87,7 +87,7 @@ export default function SpeelschemaPage() {
               📅 WK 2026 SPEELSCHEMA
             </div>
             <div className="text-green-400 text-xs">
-              72 groepswedstrijden · tijden in NL-tijd (CEST)
+              Groepsfase + knock-out · tijden in NL-tijd (CEST)
             </div>
           </div>
         </div>
@@ -105,7 +105,7 @@ export default function SpeelschemaPage() {
 
       {/* Groepsfilter */}
       <div className="px-4 pt-3 pb-1 flex gap-2 overflow-x-auto no-scrollbar">
-        {['Alles','A','B','C','D','E','F','G','H','I','J','K','L'].map(g => (
+        {['Alles','KO','A','B','C','D','E','F','G','H','I','J','K','L'].map(g => (
           <button key={g}
             onClick={() => setFilterGroep(g)}
             className="flex-shrink-0 rounded-lg px-3 py-1 text-xs font-bold"
@@ -114,7 +114,7 @@ export default function SpeelschemaPage() {
               color: filterGroep === g ? '#000' : '#D4AF37',
               border: '1px solid #D4AF37',
             }}>
-            {g === 'Alles' ? 'Alles' : `Groep ${g}`}
+            {g === 'Alles' ? 'Alles' : g === 'KO' ? '🏆 Knock-out' : `Groep ${g}`}
           </button>
         ))}
       </div>
@@ -168,7 +168,7 @@ export default function SpeelschemaPage() {
                     <div className="flex items-center gap-1 mb-1">
                       <span className="text-xs font-bold px-1.5 py-0.5 rounded"
                         style={{ backgroundColor: '#003322', color: '#4ade80' }}>
-                        Gr. {w.groep}
+                        {w.groep === 'KO' ? '🏆 1/16' : `Gr. ${w.groep}`}
                       </span>
                       {isNL && <span className="text-xs font-bold text-blue-400">🇳🇱 NL</span>}
                       {isMijn && <span className="text-xs font-bold text-yellow-400">⭐ jouw land</span>}
@@ -196,9 +196,11 @@ export default function SpeelschemaPage() {
                       </div>
                     </div>
 
-                    <div className="mt-1 text-right">
-                      <span className="text-green-700 text-xs">{w.stadion}, {w.stad}</span>
-                    </div>
+                    {w.stadion && w.stad && (
+                      <div className="mt-1 text-right">
+                        <span className="text-green-700 text-xs">{w.stadion}, {w.stad}</span>
+                      </div>
+                    )}
                   </div>
                 )
               })}

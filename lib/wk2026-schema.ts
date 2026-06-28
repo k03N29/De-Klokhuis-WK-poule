@@ -112,6 +112,24 @@ export const WK2026: WkWedstrijd[] = [
   { id:'L4', groep:'L', utcDatum:'2026-06-23T23:00:00Z', thuis:'Panama',   uit:'Kroatië', stadion:'BMO Field',                 stad:'Toronto' },
   { id:'L5', groep:'L', utcDatum:'2026-06-27T21:00:00Z', thuis:'Panama',   uit:'Engeland',stadion:'MetLife Stadium',           stad:'East Rutherford' },
   { id:'L6', groep:'L', utcDatum:'2026-06-27T21:00:00Z', thuis:'Kroatië',  uit:'Ghana',   stadion:'Lincoln Financial Field',   stad:'Philadelphia' },
+
+  // ── RONDE VAN 32 (1/16 finale) ──
+  { id:'R1',  groep:'KO', utcDatum:'2026-06-28T19:00:00Z', thuis:'Zuid-Afrika',      uit:'Canada',              stadion:'', stad:'' },
+  { id:'R2',  groep:'KO', utcDatum:'2026-06-29T17:00:00Z', thuis:'Brazilië',         uit:'Japan',               stadion:'', stad:'' },
+  { id:'R3',  groep:'KO', utcDatum:'2026-06-29T20:30:00Z', thuis:'Duitsland',        uit:'Paraguay',            stadion:'', stad:'' },
+  { id:'R4',  groep:'KO', utcDatum:'2026-06-30T01:00:00Z', thuis:'Nederland',        uit:'Marokko',             stadion:'', stad:'', isNL:true },
+  { id:'R5',  groep:'KO', utcDatum:'2026-06-30T17:00:00Z', thuis:'Ivoorkust',        uit:'Noorwegen',           stadion:'', stad:'' },
+  { id:'R6',  groep:'KO', utcDatum:'2026-06-30T21:00:00Z', thuis:'Frankrijk',        uit:'Zweden',              stadion:'', stad:'' },
+  { id:'R7',  groep:'KO', utcDatum:'2026-07-01T01:00:00Z', thuis:'Mexico',           uit:'Ecuador',             stadion:'', stad:'' },
+  { id:'R8',  groep:'KO', utcDatum:'2026-07-01T16:00:00Z', thuis:'Engeland',         uit:'Congo',               stadion:'', stad:'' },
+  { id:'R9',  groep:'KO', utcDatum:'2026-07-01T20:00:00Z', thuis:'België',           uit:'Senegal',             stadion:'', stad:'' },
+  { id:'R10', groep:'KO', utcDatum:'2026-07-02T00:00:00Z', thuis:'Verenigde Staten', uit:'Bosnië-Herzegovina',  stadion:'', stad:'' },
+  { id:'R11', groep:'KO', utcDatum:'2026-07-02T19:00:00Z', thuis:'Spanje',           uit:'Oostenrijk',          stadion:'', stad:'' },
+  { id:'R12', groep:'KO', utcDatum:'2026-07-02T23:00:00Z', thuis:'Portugal',         uit:'Kroatië',             stadion:'', stad:'' },
+  { id:'R13', groep:'KO', utcDatum:'2026-07-03T03:00:00Z', thuis:'Zwitserland',      uit:'Algerije',            stadion:'', stad:'' },
+  { id:'R14', groep:'KO', utcDatum:'2026-07-03T18:00:00Z', thuis:'Australië',        uit:'Egypte',              stadion:'', stad:'' },
+  { id:'R15', groep:'KO', utcDatum:'2026-07-03T22:00:00Z', thuis:'Argentinië',       uit:'Kaapverdië',          stadion:'', stad:'' },
+  { id:'R16', groep:'KO', utcDatum:'2026-07-04T01:30:00Z', thuis:'Colombia',         uit:'Ghana',               stadion:'', stad:'' },
 ]
 
 // Vlaggen voor alle 48 WK-landen
