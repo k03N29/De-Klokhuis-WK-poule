@@ -260,7 +260,7 @@ export default function VoorspellingenPage() {
                         </div>
                       )}
 
-                      {locked && renderIeders(match.id)}
+                      {kickoffPassed && renderIeders(match.id)}
                     </div>
                   </div>
                 )

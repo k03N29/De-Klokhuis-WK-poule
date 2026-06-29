@@ -413,7 +413,7 @@ export default function NlVoorspellingPage() {
                   )}
                 </div>
 
-                {locked && renderIedersNl(match.id)}
+                {kickoffPassed && renderIedersNl(match.id)}
               </div>
             </div>
           )
