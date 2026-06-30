@@ -50,6 +50,7 @@ export default function WkWinnaarPage() {
   }, [fetchData])
 
   const save = async () => {
+    if (voorspellingenDicht) return
     if (!currentUser || !selected || saving) return
     setSaving(true)
     setSaved(false)
@@ -74,6 +75,8 @@ export default function WkWinnaarPage() {
   }
 
   const wkWinner = globalState?.wk_winner
+  // Voorspellingen gesloten — het toernooi is begonnen, keuzes liggen vast
+  const voorspellingenDicht = true
 
   const getFlag = (countryName: string) => {
     return WK_COUNTRIES.find(c => c.name === countryName)?.flag ?? '🏳️'
@@ -129,7 +132,9 @@ export default function WkWinnaarPage() {
           <p className="text-green-300 text-xs mb-4">
             Kies het land dat jij denkt dat het WK 2026 gaat winnen.
             Als je goed zit, verdien je <strong className="text-yellow-400">+30 punten</strong>!
-            Je kunt je voorspelling wijzigen totdat het toernooi begint.
+            {voorspellingenDicht
+              ? ' De voorspellingen zijn gesloten — je keuze ligt vast.'
+              : ' Je kunt je voorspelling wijzigen totdat het toernooi begint.'}
           </p>
 
           {myPrediction && !wkWinner && (
@@ -137,11 +142,21 @@ export default function WkWinnaarPage() {
               style={{ backgroundColor: '#004d2e', border: '1px solid #D4AF37' }}>
               <div className="text-3xl">{getFlag(myPrediction.predicted_country)}</div>
               <div className="text-white font-bold">{myPrediction.predicted_country}</div>
-              <div className="text-green-400 text-xs mt-1">Huidige keuze — je kunt nog wijzigen</div>
+              <div className="text-green-400 text-xs mt-1">
+                {voorspellingenDicht ? '🔒 Jouw definitieve keuze' : 'Huidige keuze — je kunt nog wijzigen'}
+              </div>
             </div>
           )}
 
-          {!wkWinner && (
+          {/* Geen voorspelling ingevuld én gesloten */}
+          {!wkWinner && voorspellingenDicht && !myPrediction && (
+            <div className="rounded-xl p-3 text-center text-red-300 text-sm"
+              style={{ backgroundColor: '#3d0000', border: '1px solid #660000' }}>
+              🔒 Voorspellingen gesloten — je hebt geen WK-winnaar ingevuld.
+            </div>
+          )}
+
+          {!wkWinner && !voorspellingenDicht && (
             <>
               <div className="relative mb-3">
                 <select
